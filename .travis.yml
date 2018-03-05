@@ -1,11 +1,11 @@
-sudo: true
 language: node_js
 node_js:
   - "9.5.0"
+branches:
+  only:
+    - master
 cache: 
   yarn: true
-  directories:
-    - node_modules
 script: yarn build
 deploy:
   provider: firebase
