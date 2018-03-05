@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import GoogleDirectionStore from 'Stores/GoogleDirectionStore';
+import GoogleDirectionStore from 'stores/GoogleDirectionStore';
 import styled from 'styled-components';
 import Paper from 'material-ui/Paper';
 import MapsDirectionsWalk from 'material-ui/svg-icons/maps/directions-walk';
@@ -68,13 +68,12 @@ class Directions extends Component {
     const start_location = step.start_location;
     const end_location = step.end_location;
     GoogleDirectionStore.mode = step.travel_mode;
-    GoogleDirectionStore.getDirections(
-      start_location,
-      end_location
-    ).then(res => {
-      const steps = res.routes[0].legs[0].steps;
-      this.setState({ detailsSteps: steps });
-    });
+    GoogleDirectionStore.getDirections(start_location, end_location).then(
+      res => {
+        const steps = res.routes[0].legs[0].steps;
+        this.setState({ detailsSteps: steps });
+      }
+    );
   };
 
   selectMode = mode => {
@@ -97,18 +96,16 @@ class Directions extends Component {
     const startAdd = leg.start_address;
     const destinationAdd = leg.end_address;
     const departureTime = moment().format('LT');
-    const arrivalTime = moment().add(duration, 's').format('LT');
+    const arrivalTime = moment()
+      .add(duration, 's')
+      .format('LT');
     const durationTime = moment.duration(duration, 'seconds').humanize();
     return (
       <DirectionContainer className="Directions">
         <Paper style={styles.paperStyle}>
           <div>{`${departureTime} - ${arrivalTime}`}</div>
-          <div>
-            {durationTime}
-          </div>
-          <div>
-            {`(${(distance / 1000).toFixed(2)} KM)`}
-          </div>
+          <div>{durationTime}</div>
+          <div>{`(${(distance / 1000).toFixed(2)} KM)`}</div>
           <TotalText>
             <ImageAdjust /> {startAdd}
           </TotalText>
@@ -157,9 +154,11 @@ class Directions extends Component {
                     detailsSteps.map((step, j) => {
                       let transitInstruction;
                       if (step.travel_mode === 'TRANSIT') {
-                        transitInstruction = `${step.transit.departure_stop
-                          .name} - ${step.transit.arrival_stop.name} (${step
-                          .transit.num_stops} stop(s))`;
+                        transitInstruction = `${
+                          step.transit.departure_stop.name
+                        } - ${step.transit.arrival_stop.name} (${
+                          step.transit.num_stops
+                        } stop(s))`;
                       }
                       const instruction = step.instructions.replace(
                         /<\/?[^>]+(>|$)/g,
@@ -168,10 +167,9 @@ class Directions extends Component {
                       return (
                         <div key={`detail-step-${j}`}>
                           {instruction}
-                          {transitInstruction &&
-                            <div>
-                              {transitInstruction}
-                            </div>}
+                          {transitInstruction && (
+                            <div>{transitInstruction}</div>
+                          )}
                         </div>
                       );
                     })}
@@ -214,6 +212,8 @@ const TotalText = styled.div`
   over-flow: hidden;
 `;
 
-const DirectionContainer = styled.div`margin-top: 30px;`;
+const DirectionContainer = styled.div`
+  margin-top: 30px;
+`;
 
 export default Directions;

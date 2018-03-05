@@ -8,13 +8,13 @@ import Popover from 'material-ui/Popover';
 import Paper from 'material-ui/Paper';
 
 import { styles, palette } from '../styles/Theme';
-import ModoStore from '../Stores/ModoStore';
-import GoogleDirectionStore from '../Stores/GoogleDirectionStore';
+import ModoStore from '../stores/ModoStore';
+import GoogleDirectionStore from '../stores/GoogleDirectionStore';
 import MapWithSearchAndDirections from './Map/MapWithSearchAndDirections';
 import Directions from './Directions/Directions';
 import SelectedStep from './Directions/SelectedStep';
 import ModoButton from './ModoButton';
-import NotificationResource from '../Resources/NotificationsResource';
+import NotificationResource from '../resources/NotificationsResource';
 
 const muiTheme = getMuiTheme({
   fontFamily: 'Proxima Nova Light, sans-serif',

@@ -14,7 +14,7 @@ import {
 } from 'react-google-maps';
 import { SearchBox } from 'react-google-maps/lib/components/places/SearchBox';
 
-import GoogleDirectionStore from '../../Stores/GoogleDirectionStore';
+import GoogleDirectionStore from '../../stores/GoogleDirectionStore';
 import mapStyle from './mapStyle.json';
 
 let home;

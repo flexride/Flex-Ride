@@ -1,4 +1,4 @@
-import FetchResource from '../Resources/FetchResource';
+import FetchResource from '../resources/FetchResource';
 import { observable } from 'mobx';
 
 class ModoStore {
