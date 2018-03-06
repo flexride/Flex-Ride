@@ -61,7 +61,6 @@ class App extends Component {
       firebase.messaging(),
       firebase.database()
     );
-    console.log('hello');
     //this.notifications.notify('hey');
   }
 
