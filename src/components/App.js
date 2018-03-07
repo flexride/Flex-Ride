@@ -278,12 +278,12 @@ class App extends Component {
                     selectedPoint={this.state.selectedPoint}
                     switchFromPoint={this.switchFromPoint}
                   />
-                  {this.state.steps && (
+                  {this.state.steps &&
                     <SelectedStep
                       step={this.state.steps.find(step => step.selected)}
                       searchNewDirections={this.searchNewDirections}
                     />
-                  )}
+                  }
                   {directions && directions.routes ? (
                     <Directions
                       selectStep={this.selectStep}
@@ -299,7 +299,7 @@ class App extends Component {
                       </Paper>
                     )}
 
-                  {this.state.modoPopup && (
+                  {this.state.modoPopup &&
                     <Popover
                       open={this.state.modoPopup}
                       anchorEl={this.state.target}
@@ -314,8 +314,7 @@ class App extends Component {
                         });
                       }}>
                       <ModoButton selectedCar={this.state.selectedCar} />
-                    </Popover>
-                  )}
+                    </Popover>}
                 </div>
               );
             }
