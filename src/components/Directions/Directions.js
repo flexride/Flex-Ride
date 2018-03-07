@@ -116,7 +116,7 @@ class Directions extends Component {
               const distance = step.distance.text;
               const duration = step.duration.text;
               const mode = step.travel_mode;
-              const humanizeMode = _.firstUpper(mode);
+              const humanizeMode = _.upperFirst(mode);
               return (
                 <div
                   key={`icon-${i}`}

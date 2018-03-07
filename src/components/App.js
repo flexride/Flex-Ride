@@ -84,7 +84,9 @@ class App extends Component {
     });
   };
 
-  calculateNewStep = (steps, routes, oldStepId) => {
+  calculateNewStep = (steps, routes, id) => {
+    const { start_location, end_location, end_address } = routes.legs[0];
+    const { travel_mode } = steps[0];
     let duration = 0;
     let distance = 0;
     const lat_lngs = [];
@@ -96,11 +98,12 @@ class App extends Component {
       });
     });
     const lastStep = steps[steps.length - 1];
-    const humanizeMode = _.upperFirst(steps[0].travel_mode);
     let newDirection = {
-      start_location: routes.legs[0].start_location,
-      end_location: routes.legs[0].end_location,
-      id: lat_lngs,
+      start_location,
+      end_location,
+      travel_mode,
+      id,
+      lat_lngs,
       duration: {
         text: moment.duration(duration, 'seconds').humanize(),
         value: duration
@@ -109,10 +112,7 @@ class App extends Component {
         text: `${(distance / 1000).toFixed(2)} km`,
         value: distance
       },
-      travel_mode: steps[0].travel_mode,
-      instructions: `${humanizeMode} to ${routes.legs[0].end_address}`,
-      lat_lngs: lat_lngs,
-      id: oldStepId
+      instructions: `${_.upperFirst(travel_mode)} to ${end_address}`
     };
     return newDirection;
   };
@@ -182,20 +182,18 @@ class App extends Component {
         this.state.selectedPoint,
         this.state.destination,
         mode
-      ).then((res) => {
-        secondHalf = res;
-        console.log('firstHalf Steps:', firstHalf.routes[0].legs[0].steps)
-        this.replaceDirectionsFromPoint(this.state.selectedStep, firstHalf.routes[0].legs[0].steps, firstHalf.routes[0], secondHalf.routes[0].legs[0].steps, secondHalf.routes[0]);
-        if (mode === 'DRIVING') {
-          this.setState({ cars: [] });
-          this.findCarLocation(this.state.selectedPoint.lat(), this.state.selectedPoint.lng());
-        }
-        this.setState({
-          waypoints: [...this.state.waypoints, this.state.selectedPoint]
-        })
-      });
-    })
-
+      )
+    }).then((res) => {
+      secondHalf = res;
+      this.replaceDirectionsFromPoint(this.state.selectedStep, firstHalf.routes[0].legs[0].steps, firstHalf.routes[0], secondHalf.routes[0].legs[0].steps, secondHalf.routes[0]);
+      if (mode === 'DRIVING') {
+        this.setState({ cars: [] });
+        this.findCarLocation(this.state.selectedPoint.lat(), this.state.selectedPoint.lng());
+      }
+      this.setState({
+        waypoints: [...this.state.waypoints, this.state.selectedPoint]
+      })
+    });
   }
 
   searchNewDirections = (step, mode) => {
