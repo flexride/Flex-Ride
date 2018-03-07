@@ -47,7 +47,6 @@ class App extends Component {
   };
 
   selectPoint = (e) => {
-    console.log('point selected', e);
     this.setState({
       selectedPoint: e.latLng
     });
@@ -74,6 +73,7 @@ class App extends Component {
 
   selectStep = step => {
     console.log('selected: ', step);
+    console.log('steps:', this.state.steps)
     const newSteps = this.state.steps.map(item => {
       item.selected = item.id === step.id ? true : false;
       return item;
@@ -143,10 +143,9 @@ class App extends Component {
 
   replaceDirectionsFromPoint = (oldStep, firstHalfSteps, firstHalfRoutes, secondHalfSteps, secondHalfRoutes) => {
     const wayPointExists = !!this.state.waypoints[0];
-
     firstHalfSteps.forEach(step => (step.new = true));
-    const calculatedfirstHalfSteps = this.calculateNewStep(firstHalfSteps, firstHalfRoutes);
-    const calculatedsecondHalfSteps = this.calculateNewStep(secondHalfSteps, secondHalfRoutes);
+    const calculatedfirstHalfSteps = this.calculateNewStep(firstHalfSteps, firstHalfRoutes, this.state.waypoints.length);
+    const calculatedsecondHalfSteps = this.calculateNewStep(secondHalfSteps, secondHalfRoutes, this.state.waypoints.length + 1);
     calculatedfirstHalfSteps.travel_mode = this.state.selectedStep.travel_mode;
     const newStepsArray = [calculatedfirstHalfSteps, calculatedsecondHalfSteps];
     this.setState({
@@ -156,14 +155,12 @@ class App extends Component {
   };
 
   setDirections = directions => {
-    let stepId = 1;
     var myRoute = directions.routes[0].legs[0];
     const steps = [];
     myRoute.steps.forEach(step => {
-      step.id = stepId;
+      step.id = step.encoded_lat_lngs;
       step.selected = false;
       steps.push(step);
-      stepId = stepId + 1;
     });
     this.setState({
       steps: steps,
@@ -192,6 +189,7 @@ class App extends Component {
         mode
       ).then((res) => {
         secondHalf = res;
+        console.log('firstHalf Steps:', firstHalf.routes[0].legs[0].steps)
         this.replaceDirectionsFromPoint(this.state.selectedStep, firstHalf.routes[0].legs[0].steps, firstHalf.routes[0], secondHalf.routes[0].legs[0].steps, secondHalf.routes[0]);
         if (mode === 'DRIVING') {
           this.setState({ cars: [] });

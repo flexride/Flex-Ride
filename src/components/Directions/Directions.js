@@ -40,11 +40,11 @@ class Directions extends Component {
     }
     switch (mode) {
       case 'TRANSIT':
-        return '#66CCFF';
+        return 'blue';
       case 'BICYCLING':
-        return '#FDD675';
+        return 'yellow';
       case 'DRIVING':
-        return '#66CC99';
+        return 'black';
       default:
         return null;
     }
