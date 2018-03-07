@@ -11,6 +11,8 @@ import NotificationDriveEta from 'material-ui/svg-icons/notification/drive-eta';
 import MapsPlace from 'material-ui/svg-icons/maps/place';
 import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
+import _ from 'lodash';
+
 import PopoverStep from './PopoverStep';
 
 class Directions extends Component {
@@ -42,7 +44,7 @@ class Directions extends Component {
       case 'TRANSIT':
         return 'blue';
       case 'BICYCLING':
-        return 'yellow';
+        return 'orange';
       case 'DRIVING':
         return 'black';
       default:
@@ -50,10 +52,7 @@ class Directions extends Component {
     }
   }
 
-  capitalize(name) {
-    const newNmae = name.toLowerCase();
-    if (newNmae) return newNmae.slice(0, 1).toUpperCase() + newNmae.slice(1);
-  }
+
 
   handleRequestClose = () => {
     this.setState({
@@ -117,7 +116,7 @@ class Directions extends Component {
               const distance = step.distance.text;
               const duration = step.duration.text;
               const mode = step.travel_mode;
-              const humanizeMode = this.capitalize(mode);
+              const humanizeMode = _.firstUpper(mode);
               return (
                 <div
                   key={`icon-${i}`}

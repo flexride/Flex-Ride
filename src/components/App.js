@@ -6,6 +6,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Popover from 'material-ui/Popover';
 import Paper from 'material-ui/Paper';
+import _ from 'lodash';
 
 import { styles } from '../styles/Theme';
 import ModoStore from '../stores/ModoStore';
@@ -72,8 +73,6 @@ class App extends Component {
   }
 
   selectStep = step => {
-    console.log('selected: ', step);
-    console.log('steps:', this.state.steps)
     const newSteps = this.state.steps.map(item => {
       item.selected = item.id === step.id ? true : false;
       return item;
@@ -89,17 +88,15 @@ class App extends Component {
     let duration = 0;
     let distance = 0;
     const lat_lngs = [];
-    for (let i = 0; i < steps.length; i++) {
-      duration += steps[i].duration.value;
-      distance += steps[i].distance.value;
-      // path = [...path, ...steps[i].lat_lngs];
-      steps[i].lat_lngs.forEach(segment => {
+    steps.forEach((step) => {
+      duration += step.duration.value;
+      distance += step.distance.value;
+      step.lat_lngs.forEach(segment => {
         lat_lngs.push(new google.maps.LatLng(segment.lat(), segment.lng()));
       });
-    }
+    });
     const lastStep = steps[steps.length - 1];
-    const mode = steps[0].travel_mode.toLowerCase();
-    const humanizeMode = mode.slice(0, 1).toUpperCase() + mode.slice(1);
+    const humanizeMode = _.upperFirst(steps[0].travel_mode);
     let newDirection = {
       start_location: routes.legs[0].start_location,
       end_location: routes.legs[0].end_location,
@@ -176,14 +173,12 @@ class App extends Component {
     let firstHalf;
     let secondHalf;
     GoogleDirectionStore.getDirections(
-      //Get directions from start of step to point
       this.state.waypoints[0] || this.state.currentLocation,
       this.state.selectedPoint,
       this.state.selectedStep.travel_mode
     ).then((res) => {
       firstHalf = res;
       return GoogleDirectionStore.getDirections(
-        //Get directions from start of step to point
         this.state.selectedPoint,
         this.state.destination,
         mode
