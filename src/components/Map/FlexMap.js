@@ -39,7 +39,7 @@ const FlexMap = compose(
         center: currentLocation,
         onMapMounted: ref => {
           refs.map = ref;
-          this.props.setRefs(ref);
+          this.props.setRef('mapRef', ref);
         },
         onBoundsChanged: () => {
           this.setState({
@@ -48,6 +48,7 @@ const FlexMap = compose(
         },
         onSearchBoxMounted: ref => {
           refs.searchBox = ref;
+          this.props.setRef('SearchBoxRef', ref);
         },
         onPlacesChanged: () => {
           const places = refs.searchBox.getPlaces();

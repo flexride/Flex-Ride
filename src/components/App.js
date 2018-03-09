@@ -36,9 +36,10 @@ class App extends Component {
     target: {},
     waypoints: []
   };
-  setRefs = ref => {
+
+  setRef = (type, ref) => {
     this.setState({
-      refs: { map: ref }
+      [type]: ref
     });
   };
 
@@ -56,7 +57,9 @@ class App extends Component {
 
   componentDidMount() {
     if (navigator && navigator.geolocation) {
+      console.log('checking location')
       navigator.geolocation.getCurrentPosition(pos => {
+        console.log('pos', pos)
         const coords = pos.coords;
         const position = {
           lat: coords.latitude,
@@ -177,8 +180,8 @@ class App extends Component {
       steps.push(step);
     });
     this.setState({
-      steps: steps,
-      directions: directions
+      steps,
+      directions
     });
   };
 
@@ -237,7 +240,7 @@ class App extends Component {
           res.routes[0].legs[0].steps.forEach(step => {
             bounds.extend(step.start_location);
           });
-          this.state.refs.map.fitBounds(bounds);
+          this.state.mapRef.fitBounds(bounds);
           if (mode === 'DRIVING') {
             this.setState({ cars: [] });
             if (this.state.currentLocation) {
@@ -250,7 +253,7 @@ class App extends Component {
         })
         .catch(err => {
           console.err(`err fetching directions ${err}`);
-          this.state.refs.map.fitBounds(bounds);
+          this.state.mapRef.fitBounds(bounds);
         });
       return;
     }
@@ -282,17 +285,12 @@ class App extends Component {
 
   render() {
     const { currentLocation, directions } = this.state;
+    console.log('state', this.state)
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className="App">
-          <NewMap
-            googleMapURL={window.api_key}
-            loadingElement={<div style={{ height: `100%` }} />}
-            containerElement={<div style={{ height: `400px` }} />}
-            mapElement={<div style={{ height: `100%` }} />}
-          />
           {(() => {
-            if (this.isNotRender && currentLocation && currentLocation.lat) {
+            if (currentLocation && currentLocation.lat) {
               return (
                 <div>
                   <FlexMap
@@ -304,7 +302,7 @@ class App extends Component {
                     cars={this.state.cars}
                     selectModo={this.selectModo}
                     setDestination={this.setDestination}
-                    setRefs={this.setRefs}
+                    setRef={this.setRef}
                     selectPoint={this.selectPoint}
                     selectedPoint={this.state.selectedPoint}
                     switchFromPoint={this.switchFromPoint}
@@ -316,16 +314,16 @@ class App extends Component {
                     />}
                   {directions && directions.routes
                     ? <Directions
-                        selectStep={this.selectStep}
-                        directions={this.state.directions}
-                        steps={this.state.steps}
-                        searchNewDirections={this.searchNewDirections}
-                        showDetail={this.showDetail}
-                        details={this.state.detailSteps}
-                      />
+                      selectStep={this.selectStep}
+                      directions={this.state.directions}
+                      steps={this.state.steps}
+                      searchNewDirections={this.searchNewDirections}
+                      showDetail={this.showDetail}
+                      details={this.state.detailSteps}
+                    />
                     : <Paper style={paperStyle}>
-                        <span>Search for a destination to start</span>
-                      </Paper>}
+                      <span>Search for a destination to start</span>
+                    </Paper>}
 
                   {this.state.modoPopup &&
                     <Popover
