@@ -1,12 +1,15 @@
 /* global google */
+import { observable } from 'mobx';
 
-class GoogleDirectionStore {
+export class GoogleDirectionStoreClass {
   constructor() {
     this.DirectionsService = new google.maps.DirectionsService();
     //always default to transit
     this.mode = 'TRANSIT';
     this.showDetail = false;
   }
+  refs = {};
+
   getDirections = (origin, destination, mode) => {
     return new Promise((resolve, reject) => {
       this.DirectionsService.route(
@@ -28,5 +31,5 @@ class GoogleDirectionStore {
   };
 }
 
-const store = new GoogleDirectionStore();
+const store = new GoogleDirectionStoreClass();
 export default store;
