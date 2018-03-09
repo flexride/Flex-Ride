@@ -146,7 +146,6 @@ class App extends Component {
         lat_lngs.push(new google.maps.LatLng(segment.lat(), segment.lng()));
       });
     });
-    const lastStep = steps[steps.length - 1];
     const humanizeMode = _.upperFirst(steps[0].travel_mode);
     let newDirection = {
       start_location: routes.legs[0].start_location,
@@ -162,8 +161,7 @@ class App extends Component {
       },
       travel_mode: steps[0].travel_mode,
       instructions: `${humanizeMode} to ${routes.legs[0].end_address}`,
-      lat_lngs: lat_lngs,
-      id: oldStepId
+      lat_lngs: lat_lngs
     };
     return newDirection;
   };

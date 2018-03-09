@@ -1,11 +1,8 @@
 /* global google */
 import React from 'react';
-import FaAnchor from 'react-icons/lib/fa/anchor';
 
-import _ from 'lodash';
 import { compose, withProps, lifecycle } from 'recompose';
 import {
-  withScriptjs,
   withGoogleMap,
   GoogleMap,
   Marker,
@@ -14,12 +11,8 @@ import {
   InfoWindow
 } from 'react-google-maps';
 import { SearchBox } from 'react-google-maps/lib/components/places/SearchBox';
-import FlatButton from 'material-ui/FlatButton';
 
-import GoogleDirectionStore from '../../stores/GoogleDirectionStore';
 import mapStyle from './mapStyle.json';
-
-let destination;
 
 const FlexMap = compose(
   withProps({
@@ -147,9 +140,6 @@ const FlexMap = compose(
           switch (step.travel_mode) {
             case 'WALKING':
               color = 'gray';
-              break;
-            case 'WALKING':
-              color = 'yellow';
               break;
             case 'DRIVING':
               color = 'gray';
