@@ -11,7 +11,7 @@ import _ from 'lodash';
 import { styles } from '../styles/Theme';
 import ModoStore from '../stores/ModoStore';
 import GoogleDirectionStore from '../stores/GoogleDirectionStore';
-import MapWithSearchAndDirections from './Map/MapWithSearchAndDirections';
+import Map from './Map/Map';
 import Directions from './Directions/Directions';
 import SelectedStep from './Directions/SelectedStep';
 import ModoButton from './ModoButton';
@@ -47,11 +47,11 @@ class App extends Component {
     });
   };
 
-  selectPoint = (e) => {
+  selectPoint = e => {
     this.setState({
       selectedPoint: e.latLng
     });
-  }
+  };
 
   componentDidMount() {
     if (navigator && navigator.geolocation) {
@@ -88,7 +88,7 @@ class App extends Component {
     let duration = 0;
     let distance = 0;
     const lat_lngs = [];
-    steps.forEach((step) => {
+    steps.forEach(step => {
       duration += step.duration.value;
       distance += step.distance.value;
       step.lat_lngs.forEach(segment => {
@@ -138,15 +138,31 @@ class App extends Component {
     GoogleDirectionStore.mode = 'TRANSIT';
   };
 
-  replaceDirectionsFromPoint = (oldStep, firstHalfSteps, firstHalfRoutes, secondHalfSteps, secondHalfRoutes) => {
+  replaceDirectionsFromPoint = (
+    oldStep,
+    firstHalfSteps,
+    firstHalfRoutes,
+    secondHalfSteps,
+    secondHalfRoutes
+  ) => {
     const wayPointExists = !!this.state.waypoints[0];
     firstHalfSteps.forEach(step => (step.new = true));
-    const calculatedfirstHalfSteps = this.calculateNewStep(firstHalfSteps, firstHalfRoutes, this.state.waypoints.length);
-    const calculatedsecondHalfSteps = this.calculateNewStep(secondHalfSteps, secondHalfRoutes, this.state.waypoints.length + 1);
+    const calculatedfirstHalfSteps = this.calculateNewStep(
+      firstHalfSteps,
+      firstHalfRoutes,
+      this.state.waypoints.length
+    );
+    const calculatedsecondHalfSteps = this.calculateNewStep(
+      secondHalfSteps,
+      secondHalfRoutes,
+      this.state.waypoints.length + 1
+    );
     calculatedfirstHalfSteps.travel_mode = this.state.selectedStep.travel_mode;
     const newStepsArray = [calculatedfirstHalfSteps, calculatedsecondHalfSteps];
     this.setState({
-      steps: wayPointExists ? [this.state.steps[0], ...newStepsArray] : newStepsArray
+      steps: wayPointExists
+        ? [this.state.steps[0], ...newStepsArray]
+        : newStepsArray
     });
     GoogleDirectionStore.mode = 'TRANSIT';
   };
@@ -165,7 +181,7 @@ class App extends Component {
     });
   };
 
-  switchFromPoint = (mode) => {
+  switchFromPoint = mode => {
     if (this.state.waypoints.length >= 2) {
       console.log('only 2 switches can be made');
       return;
@@ -176,27 +192,35 @@ class App extends Component {
       this.state.waypoints[0] || this.state.currentLocation,
       this.state.selectedPoint,
       this.state.selectedStep.travel_mode
-    ).then((res) => {
+    ).then(res => {
       firstHalf = res;
       return GoogleDirectionStore.getDirections(
         this.state.selectedPoint,
         this.state.destination,
         mode
-      ).then((res) => {
+      ).then(res => {
         secondHalf = res;
-        console.log('firstHalf Steps:', firstHalf.routes[0].legs[0].steps)
-        this.replaceDirectionsFromPoint(this.state.selectedStep, firstHalf.routes[0].legs[0].steps, firstHalf.routes[0], secondHalf.routes[0].legs[0].steps, secondHalf.routes[0]);
+        console.log('firstHalf Steps:', firstHalf.routes[0].legs[0].steps);
+        this.replaceDirectionsFromPoint(
+          this.state.selectedStep,
+          firstHalf.routes[0].legs[0].steps,
+          firstHalf.routes[0],
+          secondHalf.routes[0].legs[0].steps,
+          secondHalf.routes[0]
+        );
         if (mode === 'DRIVING') {
           this.setState({ cars: [] });
-          this.findCarLocation(this.state.selectedPoint.lat(), this.state.selectedPoint.lng());
+          this.findCarLocation(
+            this.state.selectedPoint.lat(),
+            this.state.selectedPoint.lng()
+          );
         }
         this.setState({
           waypoints: [...this.state.waypoints, this.state.selectedPoint]
-        })
+        });
       });
-    })
-
-  }
+    });
+  };
 
   searchNewDirections = (step, mode) => {
     // tryign to use point instead of step
@@ -264,7 +288,7 @@ class App extends Component {
             if (currentLocation && currentLocation.lat) {
               return (
                 <div>
-                  <MapWithSearchAndDirections
+                  <Map
                     currentLocation={this.state.currentLocation}
                     setDirections={this.setDirections}
                     path={this.state.path}
@@ -282,22 +306,19 @@ class App extends Component {
                     <SelectedStep
                       step={this.state.steps.find(step => step.selected)}
                       searchNewDirections={this.searchNewDirections}
-                    />
-                  }
-                  {directions && directions.routes ? (
-                    <Directions
-                      selectStep={this.selectStep}
-                      directions={this.state.directions}
-                      steps={this.state.steps}
-                      searchNewDirections={this.searchNewDirections}
-                      showDetail={this.showDetail}
-                      details={this.state.detailSteps}
-                    />
-                  ) : (
-                      <Paper style={paperStyle}>
+                    />}
+                  {directions && directions.routes
+                    ? <Directions
+                        selectStep={this.selectStep}
+                        directions={this.state.directions}
+                        steps={this.state.steps}
+                        searchNewDirections={this.searchNewDirections}
+                        showDetail={this.showDetail}
+                        details={this.state.detailSteps}
+                      />
+                    : <Paper style={paperStyle}>
                         <span>Search for a destination to start</span>
-                      </Paper>
-                    )}
+                      </Paper>}
 
                   {this.state.modoPopup &&
                     <Popover

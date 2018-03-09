@@ -98,7 +98,7 @@ const MapWithASearch = compose(
     }
   }),
   withGoogleMap
-)(props => (
+)(props =>
   <div>
     <GoogleMap
       center={props.currentLocation}
@@ -130,9 +130,9 @@ const MapWithASearch = compose(
           type="text"
         />
       </SearchBox>
-      {props.markers.map((marker, index) => (
+      {props.markers.map((marker, index) =>
         <Marker key={index} position={marker.position} />
-      ))}
+      )}
       {props.selectedPoint &&
         <Marker
           position={props.selectedPoint}
@@ -141,20 +141,37 @@ const MapWithASearch = compose(
             scale: 5
           }}
           onClick={e => {
-            console.log('point clicked')
-          }}
-        >
-          <InfoWindow >
+            console.log('point clicked');
+          }}>
+          <InfoWindow>
             <div>
-              <div onClick={() => { props.switchFromPoint('WALKING') }}> Walk </div>
-              <div onClick={() => { props.switchFromPoint('DRIVING') }}> Drive </div>
-              <div onClick={() => { props.switchFromPoint('TRANSIT') }}> Transit </div>
-              <div onClick={() => { props.switchFromPoint('BICYCLING') }}> Bike </div>
+              <div
+                onClick={() => {
+                  props.switchFromPoint('WALKING');
+                }}>
+                {' '}Walk{' '}
+              </div>
+              <div
+                onClick={() => {
+                  props.switchFromPoint('DRIVING');
+                }}>
+                {' '}Drive{' '}
+              </div>
+              <div
+                onClick={() => {
+                  props.switchFromPoint('TRANSIT');
+                }}>
+                {' '}Transit{' '}
+              </div>
+              <div
+                onClick={() => {
+                  props.switchFromPoint('BICYCLING');
+                }}>
+                {' '}Bike{' '}
+              </div>
             </div>
           </InfoWindow>
-
-        </Marker>
-      }
+        </Marker>}
       {props.cars.map((car, index) => {
         return (
           <Marker
@@ -200,7 +217,7 @@ const MapWithASearch = compose(
                 strokeColor: color,
                 strokeWeight: 5
               }}
-              onClick={(e) => {
+              onClick={e => {
                 if (!step.new) {
                   props.selectStep(step);
                 }
@@ -213,6 +230,6 @@ const MapWithASearch = compose(
       {props.directions && <DirectionsRenderer directions={props.directions} />}
     </GoogleMap>
   </div>
-));
+);
 
 export default MapWithASearch;
