@@ -46,7 +46,7 @@ class Directions extends Component {
       case 'BICYCLING':
         return 'orange';
       case 'DRIVING':
-        return 'black';
+        return 'gray';
       default:
         return null;
     }
@@ -116,7 +116,7 @@ class Directions extends Component {
               const distance = step.distance.text;
               const duration = step.duration.text;
               const mode = step.travel_mode;
-              const humanizeMode = _.firstUpper(mode);
+              const humanizeMode = _.upperFirst(mode);
               return (
                 <div
                   key={`icon-${i}`}
@@ -126,7 +126,7 @@ class Directions extends Component {
                         openPopover: true,
                         anchorEl: e.currentTarget
                       });
-                      this.props.selectStep(step.id);
+                      this.props.selectStep(step);
                     }
                   }}>
                   <RaisedButton
@@ -140,11 +140,7 @@ class Directions extends Component {
                     disabled={mode === 'WALKING' ? true : false}
                     icon={this.getModeIcon(mode)}
                     label={`${humanizeMode} ${distance} (${duration})`}
-                    onClick={() => {
-                      if (!step.new) {
-                        this.props.selectStep(step.id);
-                      }
-                    }}
+                    onClick={() => { }}
                   />
                   {step.selected &&
                     GoogleDirectionStore.showDetail &&

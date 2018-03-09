@@ -34,7 +34,8 @@ class App extends Component {
     modoPopup: false,
     selectedCar: {},
     target: {},
-    waypoints: []
+    waypoints: [],
+    center: {}
   };
 
   setRef = (type, ref) => {
@@ -65,7 +66,10 @@ class App extends Component {
           lat: coords.latitude,
           lng: coords.longitude
         };
-        this.setState({ currentLocation: position });
+        this.setState({
+          currentLocation: position,
+          markers: [{ position }]
+        });
       });
     }
     // experimental firebase stuff
@@ -87,6 +91,49 @@ class App extends Component {
       selectedStep: step
     });
   };
+
+  onPlacesChanged = () => {
+    const places = this.state.searchBoxRef.getPlaces();
+    const bounds = new google.maps.LatLngBounds();
+    places.forEach(place => {
+      if (place.geometry.viewport) {
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+    const nextMarkers = places.map(place => ({
+      position: place.geometry.location
+    }));
+    const nextCenter = _.get(
+      nextMarkers,
+      '0.position',
+      this.state.center
+    );
+    const destination = nextMarkers[0];
+    this.setState({
+      center: nextCenter,
+      markers: [this.state.markers[0], nextMarkers[0]]
+    });
+    // refs.map.fitBounds(bounds);
+    // Render Directions
+    this.setDestination(destination.position);
+    GoogleDirectionStore.getDirections(
+      this.state.currentLocation,
+      destination.position
+    )
+      .then(res => {
+        this.setDirections(res);
+        res.routes[0].legs[0].steps.forEach(step => {
+          bounds.extend(step.start_location);
+        });
+        this.state.mapRef.fitBounds(bounds);
+      })
+      .catch(err => {
+        console.err(`err fetching directions ${err}`);
+        this.state.mapRef.fitBounds(bounds);
+      });
+  }
 
   calculateNewStep = (steps, routes, oldStepId) => {
     let duration = 0;
@@ -306,6 +353,8 @@ class App extends Component {
                     selectPoint={this.selectPoint}
                     selectedPoint={this.state.selectedPoint}
                     switchFromPoint={this.switchFromPoint}
+                    onPlacesChanged={this.onPlacesChanged}
+                    markers={this.state.markers}
                   />
                   {this.state.steps &&
                     <SelectedStep

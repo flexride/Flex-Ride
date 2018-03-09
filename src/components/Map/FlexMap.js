@@ -31,9 +31,6 @@ const FlexMap = compose(
     componentWillMount() {
       const refs = {};
       const { currentLocation } = this.props;
-      if (currentLocation && currentLocation.lat) {
-        this.setState({ markers: [{ position: currentLocation }] });
-      }
       this.setState({
         bounds: null,
         center: currentLocation,
@@ -48,50 +45,9 @@ const FlexMap = compose(
         },
         onSearchBoxMounted: ref => {
           refs.searchBox = ref;
-          this.props.setRef('SearchBoxRef', ref);
+          this.props.setRef('searchBoxRef', ref);
         },
-        onPlacesChanged: () => {
-          const places = refs.searchBox.getPlaces();
-          const bounds = new google.maps.LatLngBounds();
-          places.forEach(place => {
-            if (place.geometry.viewport) {
-              bounds.union(place.geometry.viewport);
-            } else {
-              bounds.extend(place.geometry.location);
-            }
-          });
-          const nextMarkers = places.map(place => ({
-            position: place.geometry.location
-          }));
-          const nextCenter = _.get(
-            nextMarkers,
-            '0.position',
-            this.state.center
-          );
-          destination = nextMarkers[0];
-          this.setState({
-            center: nextCenter,
-            markers: [this.state.markers[0], nextMarkers[0]]
-          });
-          // refs.map.fitBounds(bounds);
-          // Render Directions
-          this.props.setDestination(destination.position);
-          GoogleDirectionStore.getDirections(
-            currentLocation,
-            destination.position
-          )
-            .then(res => {
-              this.props.setDirections(res);
-              res.routes[0].legs[0].steps.forEach(step => {
-                bounds.extend(step.start_location);
-              });
-              refs.map.fitBounds(bounds);
-            })
-            .catch(err => {
-              console.err(`err fetching directions ${err}`);
-              refs.map.fitBounds(bounds);
-            });
-        }
+        onPlacesChanged: this.props.onPlacesChanged
       });
     }
   }),
@@ -196,7 +152,7 @@ const FlexMap = compose(
               color = 'yellow';
               break;
             case 'DRIVING':
-              color = 'black';
+              color = 'gray';
               break;
             case 'BICYCLING':
               color = 'orange';
