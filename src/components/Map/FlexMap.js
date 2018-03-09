@@ -19,12 +19,9 @@ import FlatButton from 'material-ui/FlatButton';
 import GoogleDirectionStore from '../../stores/GoogleDirectionStore';
 import mapStyle from './mapStyle.json';
 
-let home;
-const testLocation = { lat: 49.23124000000001, lng: -123.00459539999997 };
-const douglas = { lat: 49.2035681, lng: -122.9126894 };
 let destination;
 
-const MapWithASearch = compose(
+const FlexMap = compose(
   withProps({
     loadingElement: <div style={{ height: `100%` }} />,
     containerElement: <div style={{ height: `400px` }} />,
@@ -232,4 +229,4 @@ const MapWithASearch = compose(
   </div>
 );
 
-export default MapWithASearch;
+export default FlexMap;
