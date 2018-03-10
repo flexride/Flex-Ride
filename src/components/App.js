@@ -285,14 +285,16 @@ class App extends Component {
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className="App">
-          <NewMap
-            googleMapURL={window.api_key}
-            loadingElement={<div style={{ height: `100%` }} />}
-            containerElement={<div style={{ height: `400px` }} />}
-            mapElement={<div style={{ height: `100%` }} />}
-            currentLocation={this.state.currentLocation}
-          />
-
+          {currentLocation &&
+            currentLocation.lat &&
+            <NewMap
+              googleMapURL={window.api_key}
+              loadingElement={<div style={{ height: `100%` }} />}
+              containerElement={<div style={{ height: `400px` }} />}
+              mapElement={<div style={{ height: `100%` }} />}
+              currentLocation={this.state.currentLocation}
+              setRefs={this.setRefs}
+            />}
           {(() => {
             if (this.isNotRender && currentLocation && currentLocation.lat) {
               return (
