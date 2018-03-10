@@ -33,7 +33,8 @@ class App extends Component {
     modoPopup: false,
     selectedCar: {},
     target: {},
-    waypoints: []
+    waypoints: [],
+    center: {}
   };
   setRefs = ref => {
     this.setState({
@@ -61,7 +62,10 @@ class App extends Component {
           lat: coords.latitude,
           lng: coords.longitude
         };
-        this.setState({ currentLocation: position });
+        this.setState({
+          currentLocation: position,
+          markers: [{ position }]
+        });
       });
     }
     // experimental firebase stuff
@@ -84,6 +88,45 @@ class App extends Component {
     });
   };
 
+  onPlacesChanged = () => {
+    const places = this.state.searchBoxRef.getPlaces();
+    const bounds = new google.maps.LatLngBounds();
+    places.forEach(place => {
+      if (place.geometry.viewport) {
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+    const nextMarkers = places.map(place => ({
+      position: place.geometry.location
+    }));
+    const nextCenter = _.get(nextMarkers, '0.position', this.state.center);
+    const destination = nextMarkers[0];
+    this.setState({
+      center: nextCenter,
+      markers: [this.state.markers[0], nextMarkers[0]]
+    });
+    // refs.map.fitBounds(bounds);
+    // Render Directions
+    this.setDestination(destination.position);
+    GoogleDirectionStore.getDirections(
+      this.state.currentLocation,
+      destination.position
+    )
+      .then(res => {
+        this.setDirections(res);
+        res.routes[0].legs[0].steps.forEach(step => {
+          bounds.extend(step.start_location);
+        });
+        this.state.mapRef.fitBounds(bounds);
+      })
+      .catch(err => {
+        console.err(`err fetching directions ${err}`);
+        this.state.mapRef.fitBounds(bounds);
+      });
+  };
+
   calculateNewStep = (steps, routes, oldStepId) => {
     let duration = 0;
     let distance = 0;
@@ -95,7 +138,6 @@ class App extends Component {
         lat_lngs.push(new google.maps.LatLng(segment.lat(), segment.lng()));
       });
     });
-    const lastStep = steps[steps.length - 1];
     const humanizeMode = _.upperFirst(steps[0].travel_mode);
     let newDirection = {
       start_location: routes.legs[0].start_location,
@@ -111,8 +153,7 @@ class App extends Component {
       },
       travel_mode: steps[0].travel_mode,
       instructions: `${humanizeMode} to ${routes.legs[0].end_address}`,
-      lat_lngs: lat_lngs,
-      id: oldStepId
+      lat_lngs: lat_lngs
     };
     return newDirection;
   };
