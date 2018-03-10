@@ -12,7 +12,6 @@ import { styles } from '../styles/Theme';
 import ModoStore from '../stores/ModoStore';
 import GoogleDirectionStore from '../stores/GoogleDirectionStore';
 import FlexMap from './Map/FlexMap';
-import NewMap from './Map/NewMap';
 import Directions from './Directions/Directions';
 import SelectedStep from './Directions/SelectedStep';
 import ModoButton from './ModoButton';
@@ -295,7 +294,7 @@ class App extends Component {
             if (currentLocation && currentLocation.lat) {
               return (
                 <div>
-                  <NewMap
+                  <FlexMap
                     googleMapURL={window.api_key}
                     loadingElement={<div style={{ height: `100%` }} />}
                     containerElement={<div style={{ height: `400px` }} />}
