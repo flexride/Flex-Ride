@@ -281,37 +281,36 @@ class App extends Component {
   };
 
   render() {
-    const { currentLocation, directions } = this.state;
+    const {
+      currentLocation,
+      directions,
+      selectedPoint,
+      cars,
+      steps
+    } = this.state;
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className="App">
-          {currentLocation &&
-            currentLocation.lat &&
-            <NewMap
-              googleMapURL={window.api_key}
-              loadingElement={<div style={{ height: `100%` }} />}
-              containerElement={<div style={{ height: `400px` }} />}
-              mapElement={<div style={{ height: `100%` }} />}
-              currentLocation={this.state.currentLocation}
-              setRefs={this.setRefs}
-            />}
           {(() => {
-            if (this.isNotRender && currentLocation && currentLocation.lat) {
+            if (currentLocation && currentLocation.lat) {
               return (
                 <div>
-                  <FlexMap
-                    currentLocation={this.state.currentLocation}
-                    setDirections={this.setDirections}
-                    path={this.state.path}
-                    steps={this.state.steps}
-                    selectStep={this.selectStep}
-                    cars={this.state.cars}
-                    selectModo={this.selectModo}
-                    setDestination={this.setDestination}
+                  <NewMap
+                    googleMapURL={window.api_key}
+                    loadingElement={<div style={{ height: `100%` }} />}
+                    containerElement={<div style={{ height: `400px` }} />}
+                    mapElement={<div style={{ height: `100%` }} />}
+                    currentLocation={currentLocation}
                     setRefs={this.setRefs}
-                    selectPoint={this.selectPoint}
-                    selectedPoint={this.state.selectedPoint}
+                    selectedPoint={selectedPoint}
                     switchFromPoint={this.switchFromPoint}
+                    setDirections={this.setDirections}
+                    setDestination={this.setDestination}
+                    cars={cars}
+                    steps={steps}
+                    selectStep={this.selectStep}
+                    selectPoint={this.selectPoint}
+                    selectModo={this.selectModo}
                   />
                   {this.state.steps &&
                     <SelectedStep
@@ -352,17 +351,16 @@ class App extends Component {
             }
             return (
               <div>
-                {this.hideForNow &&
-                  <CircularProgress
-                    size={150}
-                    thickness={5}
-                    style={{
-                      position: 'fixed',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                  />}
+                <CircularProgress
+                  size={150}
+                  thickness={5}
+                  style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                />
               </div>
             );
           })()}

@@ -16,19 +16,8 @@ import GoogleDirectionStore from 'stores/GoogleDirectionStore';
 import mapStyle from './mapStyle.json';
 
 class NewMap extends Component {
-  // state = {
-  //   bounds: null,
-  //   center: '',
-  //   onMapMounted: '',
-  //   onBoundsChanged: '',
-  //   onSearchBoxMounted: '',
-  //   onPlacesChanged: '',
-  //   markers: ''
-  // };
-
   componentWillMount() {
     const { currentLocation } = this.props;
-    console.log('currentLocation', currentLocation);
     if (currentLocation && currentLocation.lat) {
       this.setState({ markers: [{ position: currentLocation }] });
     }
@@ -44,8 +33,9 @@ class NewMap extends Component {
 
   onMapMounted = ref => {
     const { refs } = GoogleDirectionStore;
-    ref.map = ref;
-    this.props.setRefs('mapRef', ref);
+    const { setRefs } = this.props;
+    refs.map = ref;
+    setRefs(ref);
   };
 
   onBoundsChanged = () => {
@@ -58,13 +48,12 @@ class NewMap extends Component {
   onSearchBoxMounted = ref => {
     const { refs } = GoogleDirectionStore;
     refs.searchBox = ref;
-    this.props.setRefs('SearchBoxRef', ref);
   };
 
   onPlacesChanged = () => {
     //move destnation to store
     let destination;
-    const { currentLocation } = this.props;
+    const { currentLocation, setDirections, setDestination } = this.props;
     const { refs } = GoogleDirectionStore;
     const places = refs.searchBox.getPlaces();
     const bounds = new google.maps.LatLngBounds();
@@ -85,10 +74,10 @@ class NewMap extends Component {
       markers: [this.state.markers[0], nextMarkers[0]]
     });
     // Render Directions
-    this.props.setDestination(destination.position);
+    setDestination(destination.position);
     GoogleDirectionStore.getDirections(currentLocation, destination.position)
       .then(res => {
-        this.props.setDirections(res);
+        setDirections(res);
         res.routes[0].legs[0].steps.forEach(step => {
           bounds.extend(step.start_location);
         });
@@ -101,12 +90,24 @@ class NewMap extends Component {
   };
 
   render() {
-    const { currentLocation } = this.props;
-    const { bounds, onPlacesChanged, onSearchBoxMounted } = this.props;
-    const { markers, onBoundsChanged, onMapMounted } = this.state;
-    console.log('onBoundsChanged: ', onMapMounted);
-    console.log('setRefs: ', this.props.setRefs);
-    console.log(this.state.markers);
+    const {
+      currentLocation,
+      selectedPoint,
+      switchFromPoint,
+      cars,
+      steps,
+      selectStep,
+      selectPoint,
+      selectModo
+    } = this.props;
+    const {
+      bounds,
+      onPlacesChanged,
+      onSearchBoxMounted,
+      markers,
+      onBoundsChanged,
+      onMapMounted
+    } = this.state;
     return (
       <GoogleMap
         defaultZoom={15}
@@ -124,6 +125,99 @@ class NewMap extends Component {
         {markers.map((marker, index) =>
           <Marker key={index} position={marker.position} />
         )}
+        {selectedPoint &&
+          <Marker
+            position={selectedPoint}
+            icon={{
+              path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+              scale: 5
+            }}
+            onClick={e => {
+              console.log('point clicked');
+            }}>
+            <InfoWindow>
+              <div>
+                <div
+                  onClick={() => {
+                    switchFromPoint('WALKING');
+                  }}>
+                  {' '}Walk{' '}
+                </div>
+                <div
+                  onClick={() => {
+                    switchFromPoint('DRIVING');
+                  }}>
+                  {' '}Drive{' '}
+                </div>
+                <div
+                  onClick={() => {
+                    switchFromPoint('TRANSIT');
+                  }}>
+                  {' '}Transit{' '}
+                </div>
+                <div
+                  onClick={() => {
+                    switchFromPoint('BICYCLING');
+                  }}>
+                  {' '}Bike{' '}
+                </div>
+              </div>
+            </InfoWindow>
+          </Marker>}
+        {cars.map((car, index) => {
+          return (
+            <Marker
+              key={index}
+              position={{ lat: Number(car.lat), lng: Number(car.lng) }}
+              icon={{
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10
+              }}
+              onClick={e => {
+                selectModo(e.xa.target, car);
+              }}
+            />
+          );
+        })}
+        {steps &&
+          steps.map((step, i) => {
+            let color = 'blue';
+            switch (step.travel_mode) {
+              case 'WALKING':
+                color = 'gray';
+                break;
+              case 'WALKING':
+                color = 'yellow';
+                break;
+              case 'DRIVING':
+                color = 'black';
+                break;
+              case 'BICYCLING':
+                color = 'orange';
+                break;
+              default:
+                break;
+            }
+            if (step.selected) {
+              color = 'green';
+            }
+            return (
+              <Polyline
+                key={i}
+                path={step.lat_lngs}
+                options={{
+                  strokeColor: color,
+                  strokeWeight: 5
+                }}
+                onClick={e => {
+                  if (!step.new) {
+                    selectStep(step);
+                  }
+                  selectPoint(e);
+                }}
+              />
+            );
+          })}
       </GoogleMap>
     );
   }

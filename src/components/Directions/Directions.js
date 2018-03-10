@@ -52,8 +52,6 @@ class Directions extends Component {
     }
   }
 
-
-
   handleRequestClose = () => {
     this.setState({
       openPopover: false
@@ -116,7 +114,7 @@ class Directions extends Component {
               const distance = step.distance.text;
               const duration = step.duration.text;
               const mode = step.travel_mode;
-              const humanizeMode = _.firstUpper(mode);
+              const humanizeMode = _.upperFirst(mode.toLowerCase());
               return (
                 <div
                   key={`icon-${i}`}
@@ -154,7 +152,7 @@ class Directions extends Component {
                       if (step.travel_mode === 'TRANSIT') {
                         transitInstruction = `${step.transit.departure_stop
                           .name} - ${step.transit.arrival_stop.name} (${step
-                            .transit.num_stops} stop(s))`;
+                          .transit.num_stops} stop(s))`;
                       }
                       const instruction = step.instructions.replace(
                         /<\/?[^>]+(>|$)/g,
