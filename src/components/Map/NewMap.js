@@ -45,7 +45,7 @@ class NewMap extends Component {
   onMapMounted = ref => {
     const { refs } = GoogleDirectionStore;
     ref.map = ref;
-    this.props.setRef('mapRef', ref);
+    this.props.setRefs('mapRef', ref);
   };
 
   onBoundsChanged = () => {
@@ -58,7 +58,7 @@ class NewMap extends Component {
   onSearchBoxMounted = ref => {
     const { refs } = GoogleDirectionStore;
     refs.searchBox = ref;
-    this.props.setRef('SearchBoxRef', ref);
+    this.props.setRefs('SearchBoxRef', ref);
   };
 
   onPlacesChanged = () => {
@@ -105,7 +105,7 @@ class NewMap extends Component {
     const { bounds, onPlacesChanged, onSearchBoxMounted } = this.props;
     const { markers, onBoundsChanged, onMapMounted } = this.state;
     console.log('onBoundsChanged: ', onMapMounted);
-    console.log('state onBoundsChanged: ', this.state.onMapMounted);
+    console.log('setRefs: ', this.props.setRefs);
     console.log(this.state.markers);
     return (
       <GoogleMap
