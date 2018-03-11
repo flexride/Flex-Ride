@@ -1,3 +1,4 @@
+/* global google */
 import React from 'react'; //hi
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';

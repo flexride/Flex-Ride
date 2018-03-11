@@ -52,8 +52,6 @@ class Directions extends Component {
     }
   }
 
-
-
   handleRequestClose = () => {
     this.setState({
       openPopover: false
@@ -83,7 +81,7 @@ class Directions extends Component {
   };
 
   render() {
-    const { directions, steps } = this.props;
+    const { directions, steps } = DirectionsStore;
     const { detailsSteps } = this.state;
     const leg = directions.routes[0].legs[0];
     let duration = 0;
@@ -116,7 +114,8 @@ class Directions extends Component {
               const distance = step.distance.text;
               const duration = step.duration.text;
               const mode = step.travel_mode;
-              const humanizeMode = _.upperFirst(mode);
+              const humanizeMode = _.upperFirst(mode.toLowerCase());
+
               return (
                 <div
                   key={`icon-${i}`}

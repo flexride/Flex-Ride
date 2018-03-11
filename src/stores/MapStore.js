@@ -1,5 +1,9 @@
 /* global google */
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
+import _ from 'lodash';
+import { toJS } from 'mobx';
+
+import DirectionsStore from './DirectionsStore';
 
 
 class MapStore {
@@ -9,6 +13,7 @@ class MapStore {
   @observable currentLocation = null
   @observable center = null
   @observable selectedPoint = null
+  @observable bounds = null //new google.maps.LatLngBounds();
 
   getLocation = () => {
     if (navigator && navigator.geolocation) {
@@ -42,15 +47,66 @@ class MapStore {
     }
   }
 
-  selectPoint = e => {
-    this.selectPoint = e.latLng;
+  onPlacesChanged = () => {
+    const places = this.refs.searchBox.getPlaces();
+    const bounds = new google.maps.LatLngBounds();
+    if (places.length === 0) {
+      return;
+    }
+    places.forEach(place => {
+      if (place.geometry.viewport) {
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+    const nextMarkers = places.map(place => ({
+      position: place.geometry.location
+    }));
+    const nextCenter = _.get(
+      nextMarkers,
+      '0.position',
+      this.center
+    );
+    const destination = nextMarkers[0];
+    this.center = nextCenter;
+    this.markers = [this.markers[0], nextMarkers[0]];
+    // MapsStore.refs.map.fitBounds(bounds);
+    // Render Directions
+    DirectionsStore.setDestination(destination.position);
+    DirectionsStore.getDirections(
+      this.currentLocation,
+      toJS(destination.position)
+    )
+      .then(res => {
+        DirectionsStore.setDirections(res);
+        res.routes[0].legs[0].steps.forEach(step => {
+          bounds.extend(step.start_location);
+        });
+        this.refs.map.fitBounds(bounds);
+      })
+      .catch(err => {
+        console.err(`err fetching directions ${err}`);
+        this.refs.map.fitBounds(bounds);
+      });
   };
 
-  setRef = (type, ref) => {
-    this.refs[type] = ref;
-    console.log('setting ref')
-    console.log(type, this.refs[type])
-  }
+  @action.bound
+  selectPoint = e => {
+    this.selectedPoint = e.latLng;
+  };
+
+  onMapMounted = ref => {
+    this.refs.map = ref;
+  };
+
+  onBoundsChanged = () => {
+    this.refs.map.getBounds()
+  };
+
+  onSearchBoxMounted = ref => {
+    this.refs.searchBox = ref;
+  };
 }
 
 const store = new MapStore();
