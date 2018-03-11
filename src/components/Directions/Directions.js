@@ -114,12 +114,8 @@ class Directions extends Component {
               const distance = step.distance.text;
               const duration = step.duration.text;
               const mode = step.travel_mode;
-<<<<<<< HEAD
-              const humanizeMode = _.upperFirst(mode);
-=======
               const humanizeMode = _.upperFirst(mode.toLowerCase());
 
->>>>>>> feature/map_refactor
               return (
                 <div
                   key={`icon-${i}`}
