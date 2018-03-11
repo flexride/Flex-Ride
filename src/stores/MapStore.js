@@ -15,35 +15,28 @@ class MapStore {
   @observable selectedPoint = null
   @observable bounds = null //new google.maps.LatLngBounds();
 
-  getLocation = () => {
+  getDummyLocation = () => {
+    const testCoords = window.jonnysHouse;
+    const position = {
+      lat: testCoords.latitude,
+      lng: testCoords.longitude
+    };
+    this.currentLocation = position;
+    this.markers = [{ position }];
+  }
+
+  getLocation = (test) => {
     if (navigator && navigator.geolocation) {
       console.log('checking location');
-      //todo:
-      ////////////////
-      const jonnysHouse = {
-        latitude: 49.234826899999995,
-        longitude: -123.02521259999999
-      }
-      const position = {
-        lat: jonnysHouse.latitude,
-        lng: jonnysHouse.longitude
-      };
-      this.currentLocation = position;
-      this.markers = [{ position }];
-
-
-      ///////////
-      /// remove
-      //   navigator.geolocation.getCurrentPosition(pos => {
-      //     console.log('pos', pos)
-      //     const { coords } = pos;
-      //     const position = {
-      //       lat: coords.latitude,
-      //       lng: coords.longitude
-      //     };
-      //     this.currentLocation = position;
-      //     this.markers = [{ position }];
-      //   });
+      navigator.geolocation.getCurrentPosition(pos => {
+        const { coords } = pos;
+        const position = {
+          lat: coords.latitude,
+          lng: coords.longitude
+        };
+        this.currentLocation = position;
+        this.markers = [{ position }];
+      });
     }
   }
 

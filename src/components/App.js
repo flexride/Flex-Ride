@@ -20,7 +20,7 @@ import ModoButton from './ModoButton';
 import NotificationResource from '../resources/NotificationsResource';
 
 const muiTheme = getMuiTheme({
-  fontFamily: 'Proxima Nova Light, sans-serif',
+  fontFamily: 'Proxima Nova  ght, sans-serif',
   chip: styles.chip,
   floatingActionButton: styles.floatingActionButton,
   paper: styles.paper,
@@ -47,7 +47,6 @@ class App extends Component {
     const { mapLoaded } = this.state;
     const { cars, selectModo, selectedCar, modoPopup, target } = ModoStore;
     const { currentLocation, selectedPoint } = MapStore;
-    console.log('cars', cars)
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className="App">
