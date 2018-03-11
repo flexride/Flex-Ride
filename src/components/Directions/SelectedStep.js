@@ -4,9 +4,6 @@ import Paper from 'material-ui/Paper';
 
 class SelectedStep extends Component {
   handleClick(mode) {
-    console.log('handling click');
-    console.log('mode', mode);
-    console.log('this.props.step', this.props.step);
     this.props.searchNewDirections(this.props.step, mode);
   }
 

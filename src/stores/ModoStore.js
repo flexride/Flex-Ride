@@ -4,8 +4,11 @@ import { observable } from 'mobx';
 class ModoStore {
   @observable nearby = [];
   @observable locations = [];
-  @observable blankArray = [];
-  @observable isLoading = true;
+  @observable cars = [];
+  @observable isLoading = true
+  @observable modoPopup = false
+  @observable selectedCar = null
+  @observable target = null
 
   getNearby(lat, lng) {
     return new Promise(resolve => {
@@ -20,6 +23,14 @@ class ModoStore {
     });
   }
 
+  selectModo = (e, car) => {
+    this.modoPopup = true;
+    this.selectedCar = car;
+    this.target = e;
+  };
+
+  clearCars = () => this.cars = [];
+
   getCars() {
     return new Promise(resolve => {
       FetchResource.callModo('car_list')
@@ -33,6 +44,13 @@ class ModoStore {
         });
     });
   }
+
+  findCarLocation = (lat, lng) => {
+    this.clearCars();
+    this.getNearby(lat, lng).then(() => {
+      this.findCarsFromLocation();
+    });
+  };
 
   getLocations() {
     return new Promise(resolve => {
@@ -111,12 +129,13 @@ class ModoStore {
                         lat: res.lat,
                         lng: res.lng
                       };
-                      this.blankArray.push(obj);
+                      this.cars.push(obj);
                     }
                   });
                 }
               });
             });
+            console.log('cars in store', this.cars)
             resolve();
           }
         });

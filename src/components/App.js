@@ -7,11 +7,13 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Popover from 'material-ui/Popover';
 import Paper from 'material-ui/Paper';
 import _ from 'lodash';
+import { observer } from 'mobx-react';
 
 import { styles } from '../styles/Theme';
 import ModoStore from '../stores/ModoStore';
-import GoogleDirectionStore from '../stores/GoogleDirectionStore';
-import MapWithSearchAndDirections from './Map/MapWithSearchAndDirections';
+import DirectionsStore from '../stores/DirectionsStore';
+import MapStore from '../stores/MapStore';
+import FlexMap from './Map/FlexMap';
 import Directions from './Directions/Directions';
 import SelectedStep from './Directions/SelectedStep';
 import ModoButton from './ModoButton';
@@ -25,60 +27,19 @@ const muiTheme = getMuiTheme({
   card: styles.card
 });
 
+@observer
 class App extends Component {
   state = {
-    currentLocation: {},
-    directions: {},
-    cars: [],
-    modoPopup: false,
-    selectedCar: {},
-    target: {},
-    waypoints: []
+    mapLoaded: false
   };
-  setRefs = ref => {
-    this.setState({
-      refs: { map: ref }
-    });
-  };
-
-  setDestination = destination => {
-    this.setState({
-      destination: destination
-    });
-  };
-
-  selectPoint = (e) => {
-    this.setState({
-      selectedPoint: e.latLng
-    });
-  }
 
   componentDidMount() {
-    if (navigator && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos => {
-        const coords = pos.coords;
-        const position = {
-          lat: coords.latitude,
-          lng: coords.longitude
-        };
-        this.setState({ currentLocation: position });
-      });
-    }
-    // experimental firebase stuff
-    // this.notifications = new NotificationResource(
-    //   firebase.messaging(),
-    //   firebase.database()
-    // );
-    //this.notifications.notify('hey');
+    MapStore.getLocation();
   }
 
-  selectStep = step => {
-    const newSteps = this.state.steps.map(item => {
-      item.selected = item.id === step.id ? true : false;
-      return item;
-    });
-
+  mapLoaded = () => {
     this.setState({
+<<<<<<< HEAD
       steps: newSteps,
       selectedStep: step
     });
@@ -194,67 +155,17 @@ class App extends Component {
         waypoints: [...this.state.waypoints, this.state.selectedPoint]
       })
     });
+=======
+      mapLoaded: true
+    })
+>>>>>>> feature/map_refactor
   }
 
-  searchNewDirections = (step, mode) => {
-    // tryign to use point instead of step
-    const bounds = new google.maps.LatLngBounds();
-    if (!step) {
-      GoogleDirectionStore.getDirections(
-        this.state.currentLocation,
-        this.state.destination,
-        mode
-      )
-        .then(res => {
-          this.setDirections(res);
-          res.routes[0].legs[0].steps.forEach(step => {
-            bounds.extend(step.start_location);
-          });
-          this.state.refs.map.fitBounds(bounds);
-          if (mode === 'DRIVING') {
-            this.setState({ cars: [] });
-            if (this.state.currentLocation) {
-              this.findCarLocation(
-                this.state.currentLocation.lat,
-                this.state.currentLocation.lng
-              );
-            }
-          }
-        })
-        .catch(err => {
-          console.err(`err fetching directions ${err}`);
-          this.state.refs.map.fitBounds(bounds);
-        });
-      return;
-    }
-
-    const origin = step.start_location;
-    const destination = step.end_location;
-    GoogleDirectionStore.getDirections(origin, destination, mode).then(res => {
-      this.replaceDirections(step, res.routes[0].legs[0].steps, res.routes[0]);
-    });
-    if (mode === 'DRIVING') {
-      this.setState({ cars: [] });
-      if (origin) {
-        this.findCarLocation(origin.lat(), origin.lng());
-      }
-    }
-  };
-
-  findCarLocation = (lat, lng) => {
-    ModoStore.getNearby(lat, lng).then(() => {
-      ModoStore.findCarsFromLocation().then(() => {
-        this.setState({ cars: ModoStore.blankArray });
-      });
-    });
-  };
-
-  selectModo = (e, car) => {
-    this.setState({ modoPopup: true, selectedCar: car, target: e });
-  };
-
   render() {
-    const { currentLocation, directions } = this.state;
+    const { mapLoaded } = this.state;
+    const { cars, selectModo, selectedCar, modoPopup, target } = ModoStore;
+    const { currentLocation, selectedPoint } = MapStore;
+    console.log('cars', cars)
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className="App">
@@ -262,45 +173,37 @@ class App extends Component {
             if (currentLocation && currentLocation.lat) {
               return (
                 <div>
-                  <MapWithSearchAndDirections
-                    currentLocation={this.state.currentLocation}
-                    setDirections={this.setDirections}
-                    path={this.state.path}
-                    steps={this.state.steps}
-                    selectStep={this.selectStep}
-                    cars={this.state.cars}
-                    selectModo={this.selectModo}
-                    setDestination={this.setDestination}
-                    setRefs={this.setRefs}
-                    selectPoint={this.selectPoint}
-                    selectedPoint={this.state.selectedPoint}
-                    switchFromPoint={this.switchFromPoint}
+                  <FlexMap
+                    loadingElement={<div style={{ height: `100%` }} />}
+                    containerElement={<div style={{ height: `400px` }} />}
+                    mapElement={<div style={{ height: `100%` }} />}
+                    mapStore={MapStore}
+                    googleMapURL={"https://maps.googleapis.com/maps/api/js?key=AIzaSyAjf2ss-IiW0kVCh9tRKvF4QGmR_CXJwRA&libraries=geometry,drawing,places&v=3"}
+                    directionsStore={DirectionsStore}
+                    mapLoaded={this.mapLoaded}
+                    modoStore={ModoStore}
                   />
-                  {this.state.steps &&
+                  {mapLoaded && DirectionsStore.steps &&
                     <SelectedStep
-                      step={this.state.steps.find(step => step.selected)}
-                      searchNewDirections={this.searchNewDirections}
-                    />
-                  }
-                  {directions && directions.routes ? (
-                    <Directions
-                      selectStep={this.selectStep}
-                      directions={this.state.directions}
-                      steps={this.state.steps}
+                      step={DirectionsStore.steps.find(step => step.selected)}
+                      searchNewDirections={DirectionsStore.searchNewDirections}
+                    />}
+                  {mapLoaded && DirectionsStore.directions && DirectionsStore.directions.routes
+                    ? <Directions
+                      selectStep={DirectionsStore.selectStep}
+                      steps={DirectionsStore.steps}
                       searchNewDirections={this.searchNewDirections}
                       showDetail={this.showDetail}
-                      details={this.state.detailSteps}
+                      details={DirectionsStore.detailSteps}
                     />
-                  ) : (
-                      <Paper style={paperStyle}>
-                        <span>Search for a destination to start</span>
-                      </Paper>
-                    )}
+                    : <Paper style={paperStyle}>
+                      <span>Search for a destination to start</span>
+                    </Paper>}
 
-                  {this.state.modoPopup &&
+                  {modoPopup &&
                     <Popover
-                      open={this.state.modoPopup}
-                      anchorEl={this.state.target}
+                      open={modoPopup}
+                      anchorEl={target}
                       style={{ padding: '10px 8px 8px 8px' }}
                       anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
                       targetOrigin={{ horizontal: 'left', vertical: 'top' }}
@@ -311,22 +214,24 @@ class App extends Component {
                           target: {}
                         });
                       }}>
-                      <ModoButton selectedCar={this.state.selectedCar} />
+                      <ModoButton selectedCar={selectedCar} />
                     </Popover>}
                 </div>
               );
             }
             return (
-              <CircularProgress
-                size={150}
-                thickness={5}
-                style={{
-                  position: 'fixed',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)'
-                }}
-              />
+              <div>
+                <CircularProgress
+                  size={150}
+                  thickness={5}
+                  style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                />
+              </div>
             );
           })()}
         </div>

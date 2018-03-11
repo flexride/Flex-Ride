@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import GoogleDirectionStore from 'stores/GoogleDirectionStore';
+import DirectionsStore from 'stores/DirectionsStore';
 import styled from 'styled-components';
 import Paper from 'material-ui/Paper';
 import MapsDirectionsWalk from 'material-ui/svg-icons/maps/directions-walk';
@@ -46,13 +46,11 @@ class Directions extends Component {
       case 'BICYCLING':
         return 'orange';
       case 'DRIVING':
-        return 'black';
+        return 'gray';
       default:
         return null;
     }
   }
-
-
 
   handleRequestClose = () => {
     this.setState({
@@ -62,10 +60,10 @@ class Directions extends Component {
 
   showDetail = step => {
     this.setState({ openPopover: false });
-    GoogleDirectionStore.showDetail = true;
+    DirectionsStore.showDetail = true;
     const start_location = step.start_location;
     const end_location = step.end_location;
-    GoogleDirectionStore.getDirections(
+    DirectionsStore.getDirections(
       start_location,
       end_location,
       step.travel_mode
@@ -83,7 +81,7 @@ class Directions extends Component {
   };
 
   render() {
-    const { directions, steps } = this.props;
+    const { directions, steps } = DirectionsStore;
     const { detailsSteps } = this.state;
     const leg = directions.routes[0].legs[0];
     let duration = 0;
@@ -116,7 +114,12 @@ class Directions extends Component {
               const distance = step.distance.text;
               const duration = step.duration.text;
               const mode = step.travel_mode;
+<<<<<<< HEAD
               const humanizeMode = _.upperFirst(mode);
+=======
+              const humanizeMode = _.upperFirst(mode.toLowerCase());
+
+>>>>>>> feature/map_refactor
               return (
                 <div
                   key={`icon-${i}`}
@@ -126,7 +129,7 @@ class Directions extends Component {
                         openPopover: true,
                         anchorEl: e.currentTarget
                       });
-                      this.props.selectStep(step.id);
+                      this.props.selectStep(step);
                     }
                   }}>
                   <RaisedButton
@@ -140,14 +143,10 @@ class Directions extends Component {
                     disabled={mode === 'WALKING' ? true : false}
                     icon={this.getModeIcon(mode)}
                     label={`${humanizeMode} ${distance} (${duration})`}
-                    onClick={() => {
-                      if (!step.new) {
-                        this.props.selectStep(step.id);
-                      }
-                    }}
+                    onClick={() => { }}
                   />
                   {step.selected &&
-                    GoogleDirectionStore.showDetail &&
+                    DirectionsStore.showDetail &&
                     detailsSteps &&
                     detailsSteps.map((step, j) => {
                       let transitInstruction;

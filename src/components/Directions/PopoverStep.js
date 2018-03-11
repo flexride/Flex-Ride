@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
-import GoogleDirectionStore from 'stores/GoogleDirectionStore';
 class PopoverStep extends Component {
   handleClick(mode) {
     this.props.searchNewDirections(this.props.step, mode);
