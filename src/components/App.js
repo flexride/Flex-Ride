@@ -7,10 +7,12 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Popover from 'material-ui/Popover';
 import Paper from 'material-ui/Paper';
 import _ from 'lodash';
+import { observer } from 'mobx-react';
 
 import { styles } from '../styles/Theme';
 import ModoStore from '../stores/ModoStore';
-import GoogleDirectionStore from '../stores/GoogleDirectionStore';
+import DirectionsStore from '../stores/DirectionsStore';
+import MapStore from '../stores/MapStore';
 import FlexMap from './Map/FlexMap';
 import NewMap from './Map/NewMap';
 import Directions from './Directions/Directions';
@@ -26,9 +28,9 @@ const muiTheme = getMuiTheme({
   card: styles.card
 });
 
+@observer
 class App extends Component {
   state = {
-    currentLocation: {},
     directions: {},
     cars: [],
     modoPopup: false,
@@ -38,46 +40,8 @@ class App extends Component {
     center: {}
   };
 
-  setRef = (type, ref) => {
-    this.setState({
-      [type]: ref
-    });
-  };
-
-  setDestination = destination => {
-    this.setState({
-      destination: destination
-    });
-  };
-
-  selectPoint = e => {
-    this.setState({
-      selectedPoint: e.latLng
-    });
-  };
-
   componentDidMount() {
-    if (navigator && navigator.geolocation) {
-      console.log('checking location')
-      navigator.geolocation.getCurrentPosition(pos => {
-        console.log('pos', pos)
-        const coords = pos.coords;
-        const position = {
-          lat: coords.latitude,
-          lng: coords.longitude
-        };
-        this.setState({
-          currentLocation: position,
-          markers: [{ position }]
-        });
-      });
-    }
-    // experimental firebase stuff
-    // this.notifications = new NotificationResource(
-    //   firebase.messaging(),
-    //   firebase.database()
-    // );
-    //this.notifications.notify('hey');
+    MapStore.getLocation();
   }
 
   selectStep = step => {
@@ -93,7 +57,7 @@ class App extends Component {
   };
 
   onPlacesChanged = () => {
-    const places = this.state.searchBoxRef.getPlaces();
+    const places = MapStore.refs.searchBox.getPlaces();
     const bounds = new google.maps.LatLngBounds();
     places.forEach(place => {
       if (place.geometry.viewport) {
@@ -108,18 +72,18 @@ class App extends Component {
     const nextCenter = _.get(
       nextMarkers,
       '0.position',
-      this.state.center
+      MapStore.center
     );
     const destination = nextMarkers[0];
     this.setState({
       center: nextCenter,
-      markers: [this.state.markers[0], nextMarkers[0]]
+      markers: [MapStore.markers[0], nextMarkers[0]]
     });
-    // refs.map.fitBounds(bounds);
+    // MapsStore.refs.map.fitBounds(bounds);
     // Render Directions
     this.setDestination(destination.position);
-    GoogleDirectionStore.getDirections(
-      this.state.currentLocation,
+    DirectionsStore.getDirections(
+      MapStore.currentLocation,
       destination.position
     )
       .then(res => {
@@ -127,11 +91,11 @@ class App extends Component {
         res.routes[0].legs[0].steps.forEach(step => {
           bounds.extend(step.start_location);
         });
-        this.state.mapRef.fitBounds(bounds);
+        MapStore.refs.map.fitBounds(bounds);
       })
       .catch(err => {
         console.err(`err fetching directions ${err}`);
-        this.state.mapRef.fitBounds(bounds);
+        MapStore.refs.map.fitBounds(bounds);
       });
   }
 
@@ -184,7 +148,7 @@ class App extends Component {
     this.setState({
       steps: newStepsArray
     });
-    GoogleDirectionStore.mode = 'TRANSIT';
+    DirectionsStore.mode = 'TRANSIT';
   };
 
   replaceDirectionsFromPoint = (
@@ -213,7 +177,7 @@ class App extends Component {
         ? [this.state.steps[0], ...newStepsArray]
         : newStepsArray
     });
-    GoogleDirectionStore.mode = 'TRANSIT';
+    DirectionsStore.mode = 'TRANSIT';
   };
 
   setDirections = directions => {
@@ -237,15 +201,15 @@ class App extends Component {
     }
     let firstHalf;
     let secondHalf;
-    GoogleDirectionStore.getDirections(
-      this.state.waypoints[0] || this.state.currentLocation,
-      this.state.selectedPoint,
+    DirectionsStore.getDirections(
+      this.state.waypoints[0] || MapStore.currentLocation,
+      MapStore.selectedPoint,
       this.state.selectedStep.travel_mode
     ).then(res => {
       firstHalf = res;
-      return GoogleDirectionStore.getDirections(
-        this.state.selectedPoint,
-        this.state.destination,
+      return DirectionsStore.getDirections(
+        MapStore.selectedPoint,
+        DirectionsStore.finalDestination,
         mode
       ).then(res => {
         secondHalf = res;
@@ -260,12 +224,12 @@ class App extends Component {
         if (mode === 'DRIVING') {
           this.setState({ cars: [] });
           this.findCarLocation(
-            this.state.selectedPoint.lat(),
-            this.state.selectedPoint.lng()
+            MapStore.selectedPoint.lat(),
+            MapStore.selectedPoint.lng()
           );
         }
         this.setState({
-          waypoints: [...this.state.waypoints, this.state.selectedPoint]
+          waypoints: [...this.state.waypoints, MapStore.selectedPoint]
         });
       });
     });
@@ -275,9 +239,9 @@ class App extends Component {
     // tryign to use point instead of step
     const bounds = new google.maps.LatLngBounds();
     if (!step) {
-      GoogleDirectionStore.getDirections(
-        this.state.currentLocation,
-        this.state.destination,
+      DirectionsStore.getDirections(
+        MapStore.currentLocation,
+        DirectionsStore.finalDestination,
         mode
       )
         .then(res => {
@@ -285,27 +249,27 @@ class App extends Component {
           res.routes[0].legs[0].steps.forEach(step => {
             bounds.extend(step.start_location);
           });
-          this.state.mapRef.fitBounds(bounds);
+          MapStore.refs.map.fitBounds(bounds);
           if (mode === 'DRIVING') {
             this.setState({ cars: [] });
-            if (this.state.currentLocation) {
+            if (MapStore.currentLocation) {
               this.findCarLocation(
-                this.state.currentLocation.lat,
-                this.state.currentLocation.lng
+                MapStore.currentLocation.lat,
+                MapStore.currentLocation.lng
               );
             }
           }
         })
         .catch(err => {
           console.err(`err fetching directions ${err}`);
-          this.state.mapRef.fitBounds(bounds);
+          MapStore.refs.map.fitBounds(bounds);
         });
       return;
     }
 
     const origin = step.start_location;
     const destination = step.end_location;
-    GoogleDirectionStore.getDirections(origin, destination, mode).then(res => {
+    DirectionsStore.getDirections(origin, destination, mode).then(res => {
       this.replaceDirections(step, res.routes[0].legs[0].steps, res.routes[0]);
     });
     if (mode === 'DRIVING') {
@@ -329,8 +293,9 @@ class App extends Component {
   };
 
   render() {
-    const { currentLocation, directions } = this.state;
-    console.log('state', this.state)
+    const { directions } = this.state;
+    const { currentLocation } = MapStore;
+    console.log('rendering App')
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className="App">
@@ -339,7 +304,7 @@ class App extends Component {
               return (
                 <div>
                   <FlexMap
-                    currentLocation={this.state.currentLocation}
+                    currentLocation={MapStore.currentLocation}
                     setDirections={this.setDirections}
                     path={this.state.path}
                     steps={this.state.steps}
@@ -347,12 +312,12 @@ class App extends Component {
                     cars={this.state.cars}
                     selectModo={this.selectModo}
                     setDestination={this.setDestination}
-                    setRef={this.setRef}
-                    selectPoint={this.selectPoint}
-                    selectedPoint={this.state.selectedPoint}
+                    setRef={MapStore.setRef}
+                    selectPoint={MapStore.selectPoint}
+                    selectedPoint={MapStore.selectedPoint}
                     switchFromPoint={this.switchFromPoint}
                     onPlacesChanged={this.onPlacesChanged}
-                    markers={this.state.markers}
+                    markers={MapStore.markers}
                   />
                   {this.state.steps &&
                     <SelectedStep

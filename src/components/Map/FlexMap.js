@@ -1,6 +1,5 @@
 /* global google */
 import React from 'react';
-
 import { compose, withProps, lifecycle } from 'recompose';
 import {
   withGoogleMap,
@@ -12,6 +11,8 @@ import {
 } from 'react-google-maps';
 import { SearchBox } from 'react-google-maps/lib/components/places/SearchBox';
 
+import MapStore from '../../stores/MapStore';
+
 import mapStyle from './mapStyle.json';
 
 const FlexMap = compose(
@@ -22,23 +23,20 @@ const FlexMap = compose(
   }),
   lifecycle({
     componentWillMount() {
-      const refs = {};
       const { currentLocation } = this.props;
       this.setState({
         bounds: null,
         center: currentLocation,
         onMapMounted: ref => {
-          refs.map = ref;
-          this.props.setRef('mapRef', ref);
+          this.props.setRef('map', ref);
         },
         onBoundsChanged: () => {
           this.setState({
-            bounds: refs.map.getBounds()
+            bounds: MapStore.refs.map.getBounds()
           });
         },
         onSearchBoxMounted: ref => {
-          refs.searchBox = ref;
-          this.props.setRef('searchBoxRef', ref);
+          this.props.setRef('searchBox', ref);
         },
         onPlacesChanged: this.props.onPlacesChanged
       });

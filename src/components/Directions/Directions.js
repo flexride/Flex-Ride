@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import GoogleDirectionStore from 'stores/GoogleDirectionStore';
+import DirectionsStore from 'stores/DirectionsStore';
 import styled from 'styled-components';
 import Paper from 'material-ui/Paper';
 import MapsDirectionsWalk from 'material-ui/svg-icons/maps/directions-walk';
@@ -62,10 +62,10 @@ class Directions extends Component {
 
   showDetail = step => {
     this.setState({ openPopover: false });
-    GoogleDirectionStore.showDetail = true;
+    DirectionsStore.showDetail = true;
     const start_location = step.start_location;
     const end_location = step.end_location;
-    GoogleDirectionStore.getDirections(
+    DirectionsStore.getDirections(
       start_location,
       end_location,
       step.travel_mode
@@ -143,7 +143,7 @@ class Directions extends Component {
                     onClick={() => { }}
                   />
                   {step.selected &&
-                    GoogleDirectionStore.showDetail &&
+                    DirectionsStore.showDetail &&
                     detailsSteps &&
                     detailsSteps.map((step, j) => {
                       let transitInstruction;
