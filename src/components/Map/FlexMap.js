@@ -9,13 +9,13 @@ import {
   withGoogleMap,
   GoogleMap,
   Marker,
-  DirectionsRenderer,
-  Polyline
+  DirectionsRenderer
 } from 'react-google-maps';
 import { SearchBox } from 'react-google-maps/lib/components/places/SearchBox';
 import DirectionsStore from 'stores/DirectionsStore';
 
 import PointSwitchWindow from './PointSwitchWindow';
+import Line from './Line';
 import mapStyle from './mapStyle.json';
 
 
@@ -62,7 +62,6 @@ class FlexMap extends Component {
             <PointSwitchWindow switchFromPoint={switchFromPoint} />
           </Marker>}
         {cars.map((car, index) => {
-          console.log('rendering car marker:', car)
           return (
             <Marker
               key={index}
@@ -79,41 +78,8 @@ class FlexMap extends Component {
         })}
         {steps &&
           steps.map((step, i) => {
-            let color = 'blue';
-            switch (step.travel_mode) {
-              case 'WALKING':
-                color = 'gray';
-                break;
-              case 'WALKING':
-                color = 'yellow';
-                break;
-              case 'DRIVING':
-                color = 'black';
-                break;
-              case 'BICYCLING':
-                color = 'orange';
-                break;
-              default:
-                break;
-            }
-            if (step.selected) {
-              color = 'green';
-            }
             return (
-              <Polyline
-                key={i}
-                path={step.lat_lngs}
-                options={{
-                  strokeColor: color,
-                  strokeWeight: 5
-                }}
-                onClick={e => {
-                  if (!step.new) {
-                    selectStep(step);
-                  }
-                  selectPoint(e);
-                }}
-              />
+              <Line key={i} step={step} selectStep={selectStep} selectPoint={selectPoint} />
             );
           })}
       </GoogleMap>

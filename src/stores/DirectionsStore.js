@@ -40,7 +40,6 @@ class DirectionsStore {
     calculatedfirstHalfSteps.travel_mode = this.selectedStep.travel_mode;
     const newStepsArray = [calculatedfirstHalfSteps, calculatedsecondHalfSteps];
     this.steps = wayPointExists ? [this.steps[0], ...newStepsArray] : newStepsArray;
-    this.mode = 'TRANSIT';
   };
 
   switchFromPoint = mode => {
