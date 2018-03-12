@@ -76,7 +76,7 @@ class Directions extends Component {
   selectMode = mode => {
     const { steps } = this.props;
     const step = steps.find(step => step.selected);
-    this.props.searchNewDirections(step, mode);
+    DirectionsStore.searchNewDirections(step, mode);
     this.setState({ openPopover: false });
   };
 
