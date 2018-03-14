@@ -7,16 +7,16 @@ import moment from 'moment';
 import MapStore from './MapStore';
 import ModoStore from './ModoStore';
 
-
 class DirectionsStore {
   @observable DirectionsService = new google.maps.DirectionsService();
   @observable showDetail = false;
   @observable mode = 'TRANSIT';
-  @observable directions = {}
-  @observable finalDestination = {}
+  @observable directions = {};
+  @observable finalDestination = {};
   @observable steps = null;
-  @observable selectedStep = []
-  @observable waypoints = []
+  @observable selectedStep = [];
+  @observable waypoints = [];
+  @observable tripInformation = [];
 
   replaceDirectionsFromPoint = (
     oldStep,
@@ -39,7 +39,9 @@ class DirectionsStore {
     );
     calculatedfirstHalfSteps.travel_mode = this.selectedStep.travel_mode;
     const newStepsArray = [calculatedfirstHalfSteps, calculatedsecondHalfSteps];
-    this.steps = wayPointExists ? [this.steps[0], ...newStepsArray] : newStepsArray;
+    this.steps = wayPointExists
+      ? [this.steps[0], ...newStepsArray]
+      : newStepsArray;
   };
 
   switchFromPoint = mode => {
@@ -74,12 +76,12 @@ class DirectionsStore {
             MapStore.selectedPoint.lat(),
             MapStore.selectedPoint.lng()
           );
+          this.tripInformation = secondHalf.routes[0].legs[0];
         }
         this.waypoints = [...this.waypoints, MapStore.selectedPoint];
       });
     });
   };
-
 
   calculateNewStep = (steps, routes, oldStepId) => {
     let duration = 0;
@@ -135,11 +137,7 @@ class DirectionsStore {
     // tryign to use point instead of step
     const bounds = new google.maps.LatLngBounds();
     if (!step) {
-      this.getDirections(
-        MapStore.currentLocation,
-        this.finalDestination,
-        mode
-      )
+      this.getDirections(MapStore.currentLocation, this.finalDestination, mode)
         .then(res => {
           this.setDirections(res);
           res.routes[0].legs[0].steps.forEach(step => {
@@ -184,6 +182,9 @@ class DirectionsStore {
       step.selected = false;
       steps.push(step);
     });
+    if (directions.request.travelMode === 'DRIVING') {
+      this.tripInformation = myRoute;
+    }
     this.steps = steps;
     this.directions = directions;
   };
@@ -217,7 +218,6 @@ class DirectionsStore {
     this.steps = newSteps;
     this.selectedStep = step;
   };
-
 }
 
 const store = new DirectionsStore();

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
+import ActionIcon from 'material-ui/svg-icons/action/info';
 import moment from 'moment';
 
 class ModoButton extends Component {
@@ -15,7 +17,7 @@ class ModoButton extends Component {
   }
 
   render() {
-    const { selectedCar } = this.props;
+    const { selectedCar, estimatedCost } = this.props;
 
     return (
       <div>
@@ -30,6 +32,17 @@ class ModoButton extends Component {
         <div>
           <b>Seats: </b>
           {selectedCar.seats}
+        </div>
+        <div>
+          <b>Cost Estimate:</b>
+          ${estimatedCost}
+          <IconButton
+            tooltip="Estimate based on one way trip duration, not including return trip."
+            touch={true}
+            tooltipPosition="top-right"
+            tooltipStyles={{ fontSize: '0.5em' }}>
+            <ActionIcon />
+          </IconButton>
         </div>
         <FlatButton
           label="Book With Modo"

@@ -18,7 +18,6 @@ import PointSwitchWindow from './PointSwitchWindow';
 import Line from './Line';
 import mapStyle from './mapStyle.json';
 
-
 /* global google */
 @observer
 class FlexMap extends Component {
@@ -26,14 +25,25 @@ class FlexMap extends Component {
     this.props.mapLoaded();
   }
   render() {
-    const {
-      mapStore,
-      directionsStore,
-      modoStore
-    } = this.props;
+    const { mapStore, directionsStore, modoStore } = this.props;
     const { cars, selectModo } = modoStore;
-    const { markers, bounds, currentLocation, onMapMounted, onBoundsChanged, onSearchBoxMounted, onPlacesChanged, selectPoint, selectedPoint } = mapStore;
-    const { steps, selectStep, switchFromPoint } = directionsStore;
+    const {
+      markers,
+      bounds,
+      currentLocation,
+      onMapMounted,
+      onBoundsChanged,
+      onSearchBoxMounted,
+      onPlacesChanged,
+      selectPoint,
+      selectedPoint
+    } = mapStore;
+    const {
+      steps,
+      selectStep,
+      switchFromPoint,
+      tripInformation
+    } = directionsStore;
     return (
       <GoogleMap
         defaultZoom={15}
@@ -48,19 +58,19 @@ class FlexMap extends Component {
           ref={onSearchBoxMounted}>
           <MapInput placeholder="Search for a destination" type="text" />
         </SearchBox>
-        {markers.map((marker, index) =>
+        {markers.map((marker, index) => (
           <Marker key={index} position={marker.position} />
-        )}
-        {selectedPoint &&
+        ))}
+        {selectedPoint && (
           <Marker
             position={selectedPoint}
             icon={{
               path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
               scale: 5
-            }}
-          >
+            }}>
             <PointSwitchWindow switchFromPoint={switchFromPoint} />
-          </Marker>}
+          </Marker>
+        )}
         {cars.map((car, index) => {
           return (
             <Marker
@@ -68,10 +78,10 @@ class FlexMap extends Component {
               position={{ lat: Number(car.lat), lng: Number(car.lng) }}
               icon={{
                 path: google.maps.SymbolPath.CIRCLE,
-                scale: 10
+                scale: 5
               }}
               onClick={e => {
-                selectModo(e.xa.target, car);
+                selectModo(e.xa.target, car, tripInformation);
               }}
             />
           );
@@ -79,7 +89,12 @@ class FlexMap extends Component {
         {steps &&
           steps.map((step, i) => {
             return (
-              <Line key={i} step={step} selectStep={selectStep} selectPoint={selectPoint} />
+              <Line
+                key={i}
+                step={step}
+                selectStep={selectStep}
+                selectPoint={selectPoint}
+              />
             );
           })}
       </GoogleMap>

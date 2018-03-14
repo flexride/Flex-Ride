@@ -51,7 +51,8 @@ class App extends Component {
       selectedCar,
       modoPopup,
       target,
-      closeModo
+      closeModo,
+      estimatedCost
     } = ModoStore;
     const { currentLocation, selectedPoint } = MapStore;
     return (
@@ -102,11 +103,17 @@ class App extends Component {
                     <Popover
                       open={modoPopup}
                       anchorEl={target}
-                      style={{ padding: '10px 8px 8px 8px' }}
+                      style={{
+                        padding: '10px 8px 8px 8px',
+                        overflow: 'visible'
+                      }}
                       anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
                       targetOrigin={{ horizontal: 'left', vertical: 'top' }}
                       onRequestClose={closeModo}>
-                      <ModoButton selectedCar={selectedCar} />
+                      <ModoButton
+                        selectedCar={selectedCar}
+                        estimatedCost={estimatedCost}
+                      />
                     </Popover>
                   )}
                 </div>

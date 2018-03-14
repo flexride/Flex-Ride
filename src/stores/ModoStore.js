@@ -1,5 +1,6 @@
 import FetchResource from '../resources/FetchResource';
 import { observable } from 'mobx';
+import moment from 'moment';
 
 class ModoStore {
   @observable nearby = [];
@@ -24,10 +25,22 @@ class ModoStore {
     });
   }
 
-  selectModo = (e, car) => {
-    this.modoPopup = true;
-    this.selectedCar = car;
-    this.target = e;
+  selectModo = (e, car, tripInformation) => {
+    const currentTime = moment().format('x');
+    const endTime = moment()
+      .add(tripInformation.duration.value)
+      .format('x');
+    this.getPricing(
+      car.id,
+      currentTime,
+      endTime,
+      tripInformation.distance.value
+    ).then(res => {
+      this.estimatedCost = res['TotalCharge'];
+      this.modoPopup = true;
+      this.selectedCar = car;
+      this.target = e;
+    });
   };
 
   closeModo = () => {
@@ -65,13 +78,17 @@ class ModoStore {
     return new Promise(resolve => {
       FetchResource.callModo(
         `cost?car_id=${id}&start=${start}&end=${end}&plan=Roaming`
-      ).then(res => {
-        if (res.Response['Cost'].length !== 0) {
-          resolve(res.Response);
-        } else {
-          return;
-        }
-      });
+      )
+        .then(res => {
+          if (res.Response['Cost'].length !== 0) {
+            resolve(res.Response['Cost']);
+          } else {
+            return;
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
     });
   }
 
