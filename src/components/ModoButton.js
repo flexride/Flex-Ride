@@ -31,10 +31,6 @@ class ModoButton extends Component {
           <b>Seats: </b>
           {selectedCar.seats}
         </div>
-        <div>
-          <b>Estimated Cost: </b>
-          {selectedCar.estimatedCost}
-        </div>
         <FlatButton
           label="Book With Modo"
           onClick={this.handleClick.bind(this)}
