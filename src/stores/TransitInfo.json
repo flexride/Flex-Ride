@@ -1,0 +1,13 @@
+{
+  "expo_line": {
+    "granville_station": {
+      "zone": 1
+    },
+    "metrotown": {
+      "zone": 2
+    },
+    "burrard_station": {
+      "zone": 1
+    }
+  }
+}

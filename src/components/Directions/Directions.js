@@ -12,6 +12,8 @@ import MapsPlace from 'material-ui/svg-icons/maps/place';
 import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
 import _ from 'lodash';
+import TransitStore from 'stores/TransitStore';
+import TransitInfo from 'stores/TransitInfo.json';
 
 import PopoverStep from './PopoverStep';
 
@@ -95,6 +97,30 @@ class Directions extends Component {
     const departureTime = moment().format('LT');
     const arrivalTime = moment().add(duration, 's').format('LT');
     const durationTime = moment.duration(duration, 'seconds').humanize();
+
+    const transits = steps.filter(step => {
+      return step.travel_mode === 'TRANSIT';
+    });
+    const transitInfo = transits[0].transit;
+    const train = {
+      expo_line: {
+        burrard_station: {
+          zone: 1
+        },
+        metrotown: {
+          zone: 2
+        },
+        granville_station: {
+          zone: 1
+        }
+      }
+    };
+    console.log(transitInfo.departure_stop.name);
+    const departure = _.snakeCase(transitInfo.departure_stop.name);
+    console.log('trasit info', transitInfo);
+    const line = _.snakeCase(transitInfo.line.short_name);
+    console.log(TransitInfo);
+    console.log(TransitInfo[line][departure]);
     return (
       <DirectionContainer className="Directions">
         <Paper style={styles.paperStyle}>
@@ -139,7 +165,7 @@ class Directions extends Component {
                     disabled={mode === 'WALKING' ? true : false}
                     icon={this.getModeIcon(mode)}
                     label={`${humanizeMode} ${distance} (${duration})`}
-                    onClick={() => { }}
+                    onClick={() => {}}
                   />
                   {step.selected &&
                     DirectionsStore.showDetail &&
@@ -149,7 +175,7 @@ class Directions extends Component {
                       if (step.travel_mode === 'TRANSIT') {
                         transitInstruction = `${step.transit.departure_stop
                           .name} - ${step.transit.arrival_stop.name} (${step
-                            .transit.num_stops} stop(s))`;
+                          .transit.num_stops} stop(s))`;
                       }
                       const instruction = step.instructions.replace(
                         /<\/?[^>]+(>|$)/g,
