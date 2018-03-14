@@ -28,9 +28,11 @@ class ModoStore {
     this.modoPopup = true;
     this.selectedCar = car;
     this.target = e;
-    // const estimatedCost = this.getAvailability(car.id, )
-    //
-    // this.estimatedCost = estimatedCost
+  };
+
+  closeModo = () => {
+    this.modoPopup = false;
+    this.selectedCar = [];
   };
 
   clearCars = () => (this.cars = []);
@@ -39,22 +41,7 @@ class ModoStore {
     return new Promise(resolve => {
       FetchResource.callModo('car_list')
         .then(res => {
-          this.getLocations().then(() => {
-            resolve(res.Response['Cars']);
-          });
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    });
-  }
-
-  getLocations() {
-    return new Promise(resolve => {
-      FetchResource.callModo('location_list')
-        .then(res => {
-          this.locations = res.Response['Locations'];
-          resolve();
+          resolve(res.Response['Cars']);
         })
         .catch(err => {
           console.log(err);
@@ -97,20 +84,24 @@ class ModoStore {
 
   findLocationAndAvailability(id) {
     return new Promise(resolve => {
-      const locations = this.locations;
+      const locations = this.nearby['Locations'];
       let result = false;
+      let loop = false;
 
       this.getAvailability(id)
         .then(() => {
-          for (let key in locations) {
-            if (locations[key]['ID'] === id) {
-              result = {
-                lat: locations[key]['Latitude'],
-                lng: locations[key]['Longitude']
-              };
-              break;
+          locations.forEach(location => {
+            if (loop) {
+              return;
             }
-          }
+            if (location['LocationID'] === id) {
+              result = {
+                lat: location['Latitude'],
+                lng: location['Longitude']
+              };
+              loop = true;
+            }
+          });
           resolve(result);
         })
         .catch(() => {
@@ -152,7 +143,6 @@ class ModoStore {
                 }
               });
             });
-            console.log('cars in store', this.cars);
             resolve();
           }
         });

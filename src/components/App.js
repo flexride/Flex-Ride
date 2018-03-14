@@ -45,7 +45,14 @@ class App extends Component {
 
   render() {
     const { mapLoaded } = this.state;
-    const { cars, selectModo, selectedCar, modoPopup, target } = ModoStore;
+    const {
+      cars,
+      selectModo,
+      selectedCar,
+      modoPopup,
+      target,
+      closeModo
+    } = ModoStore;
     const { currentLocation, selectedPoint } = MapStore;
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
@@ -98,13 +105,7 @@ class App extends Component {
                       style={{ padding: '10px 8px 8px 8px' }}
                       anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
                       targetOrigin={{ horizontal: 'left', vertical: 'top' }}
-                      onRequestClose={() => {
-                        this.setState({
-                          modoPopup: false,
-                          selectedCar: {},
-                          target: {}
-                        });
-                      }}>
+                      onRequestClose={closeModo}>
                       <ModoButton selectedCar={selectedCar} />
                     </Popover>
                   )}
