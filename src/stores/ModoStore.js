@@ -5,10 +5,11 @@ class ModoStore {
   @observable nearby = [];
   @observable locations = [];
   @observable cars = [];
-  @observable isLoading = true
-  @observable modoPopup = false
-  @observable selectedCar = null
-  @observable target = null
+  @observable isLoading = true;
+  @observable modoPopup = false;
+  @observable selectedCar = [];
+  @observable target = null;
+  @observable estimatedCost = 0;
 
   getNearby(lat, lng) {
     return new Promise(resolve => {
@@ -27,9 +28,12 @@ class ModoStore {
     this.modoPopup = true;
     this.selectedCar = car;
     this.target = e;
+    // const estimatedCost = this.getAvailability(car.id, )
+    //
+    // this.estimatedCost = estimatedCost
   };
 
-  clearCars = () => this.cars = [];
+  clearCars = () => (this.cars = []);
 
   getCars() {
     return new Promise(resolve => {
@@ -44,13 +48,6 @@ class ModoStore {
         });
     });
   }
-
-  findCarLocation = (lat, lng) => {
-    this.clearCars();
-    this.getNearby(lat, lng).then(() => {
-      this.findCarsFromLocation();
-    });
-  };
 
   getLocations() {
     return new Promise(resolve => {
@@ -76,6 +73,27 @@ class ModoStore {
       });
     });
   }
+
+  getPricing(id, start, end, distance) {
+    return new Promise(resolve => {
+      FetchResource.callModo(
+        `cost?car_id=${id}&start=${start}&end=${end}&plan=Roaming`
+      ).then(res => {
+        if (res.Response['Cost'].length !== 0) {
+          resolve(res.Response);
+        } else {
+          return;
+        }
+      });
+    });
+  }
+
+  findCarLocation = (lat, lng) => {
+    this.clearCars();
+    this.getNearby(lat, lng).then(() => {
+      this.findCarsFromLocation();
+    });
+  };
 
   findLocationAndAvailability(id) {
     return new Promise(resolve => {
@@ -103,7 +121,6 @@ class ModoStore {
 
   findCarsFromLocation = () => {
     return new Promise(resolve => {
-      let carArray = [];
       if (this.nearby['Locations'].length > 0) {
         this.getCars().then(cars => {
           if (cars instanceof Object) {
@@ -135,7 +152,7 @@ class ModoStore {
                 }
               });
             });
-            console.log('cars in store', this.cars)
+            console.log('cars in store', this.cars);
             resolve();
           }
         });

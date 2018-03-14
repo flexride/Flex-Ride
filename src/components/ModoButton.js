@@ -16,6 +16,7 @@ class ModoButton extends Component {
 
   render() {
     const { selectedCar } = this.props;
+
     return (
       <div>
         <div>
@@ -29,6 +30,10 @@ class ModoButton extends Component {
         <div>
           <b>Seats: </b>
           {selectedCar.seats}
+        </div>
+        <div>
+          <b>Estimated Cost: </b>
+          {selectedCar.estimatedCost}
         </div>
         <FlatButton
           label="Book With Modo"

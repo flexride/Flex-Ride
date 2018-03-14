@@ -5,15 +5,14 @@ import { toJS } from 'mobx';
 
 import DirectionsStore from './DirectionsStore';
 
-
 class MapStore {
-  @observable refs = {}
-  @observable searchBoxRef = null
-  @observable markers = []
-  @observable currentLocation = null
-  @observable center = null
-  @observable selectedPoint = null
-  @observable bounds = null //new google.maps.LatLngBounds();
+  @observable refs = {};
+  @observable searchBoxRef = null;
+  @observable markers = [];
+  @observable currentLocation = null;
+  @observable center = null;
+  @observable selectedPoint = null;
+  @observable bounds = null; //new google.maps.LatLngBounds();
 
   getDummyLocation = () => {
     const testCoords = window.jonnysHouse;
@@ -23,22 +22,44 @@ class MapStore {
     };
     this.currentLocation = position;
     this.markers = [{ position }];
-  }
+  };
 
-  getLocation = (test) => {
+  setDefaultLocation = () => {
+    const position = {
+      lat: 49.2847563,
+      lng: -123.1143392
+    };
+    this.currentLocation = position;
+    this.markers = [{ position }];
+  };
+
+  getLocation = test => {
     if (navigator && navigator.geolocation) {
       console.log('checking location');
-      navigator.geolocation.getCurrentPosition(pos => {
-        const { coords } = pos;
-        const position = {
-          lat: coords.latitude,
-          lng: coords.longitude
-        };
-        this.currentLocation = position;
-        this.markers = [{ position }];
-      });
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const { coords } = pos;
+          const position = {
+            lat: coords.latitude,
+            lng: coords.longitude
+          };
+          this.currentLocation = position;
+          this.markers = [{ position }];
+        },
+        err => {
+          console.log(err);
+          this.setDefaultLocation();
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      this.setDefaultLocation();
     }
-  }
+  };
 
   onPlacesChanged = () => {
     const places = this.refs.searchBox.getPlaces();
@@ -56,11 +77,7 @@ class MapStore {
     const nextMarkers = places.map(place => ({
       position: place.geometry.location
     }));
-    const nextCenter = _.get(
-      nextMarkers,
-      '0.position',
-      this.center
-    );
+    const nextCenter = _.get(nextMarkers, '0.position', this.center);
     const destination = nextMarkers[0];
     this.center = nextCenter;
     this.markers = [this.markers[0], nextMarkers[0]];
@@ -94,7 +111,7 @@ class MapStore {
   };
 
   onBoundsChanged = () => {
-    this.refs.map.getBounds()
+    this.refs.map.getBounds();
   };
 
   onSearchBoxMounted = ref => {

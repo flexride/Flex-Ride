@@ -40,8 +40,8 @@ class App extends Component {
   mapLoaded = () => {
     this.setState({
       mapLoaded: true
-    })
-  }
+    });
+  };
 
   render() {
     const { mapLoaded } = this.state;
@@ -59,29 +59,39 @@ class App extends Component {
                     containerElement={<div style={{ height: `400px` }} />}
                     mapElement={<div style={{ height: `100%` }} />}
                     mapStore={MapStore}
-                    googleMapURL={"https://maps.googleapis.com/maps/api/js?key=AIzaSyAjf2ss-IiW0kVCh9tRKvF4QGmR_CXJwRA&libraries=geometry,drawing,places&v=3"}
+                    googleMapURL={
+                      'https://maps.googleapis.com/maps/api/js?key=AIzaSyAjf2ss-IiW0kVCh9tRKvF4QGmR_CXJwRA&libraries=geometry,drawing,places&v=3'
+                    }
                     directionsStore={DirectionsStore}
                     mapLoaded={this.mapLoaded}
                     modoStore={ModoStore}
                   />
-                  {mapLoaded && DirectionsStore.steps &&
-                    <SelectedStep
-                      step={DirectionsStore.steps.find(step => step.selected)}
-                      searchNewDirections={DirectionsStore.searchNewDirections}
-                    />}
-                  {mapLoaded && DirectionsStore.directions && DirectionsStore.directions.routes
-                    ? <Directions
+                  {mapLoaded &&
+                    DirectionsStore.steps && (
+                      <SelectedStep
+                        step={DirectionsStore.steps.find(step => step.selected)}
+                        searchNewDirections={
+                          DirectionsStore.searchNewDirections
+                        }
+                      />
+                    )}
+                  {mapLoaded &&
+                  DirectionsStore.directions &&
+                  DirectionsStore.directions.routes ? (
+                    <Directions
                       selectStep={DirectionsStore.selectStep}
                       steps={DirectionsStore.steps}
                       searchNewDirections={this.searchNewDirections}
                       showDetail={this.showDetail}
                       details={DirectionsStore.detailSteps}
                     />
-                    : <Paper style={paperStyle}>
+                  ) : (
+                    <Paper style={paperStyle}>
                       <span>Search for a destination to start</span>
-                    </Paper>}
+                    </Paper>
+                  )}
 
-                  {modoPopup &&
+                  {modoPopup && (
                     <Popover
                       open={modoPopup}
                       anchorEl={target}
@@ -96,7 +106,8 @@ class App extends Component {
                         });
                       }}>
                       <ModoButton selectedCar={selectedCar} />
-                    </Popover>}
+                    </Popover>
+                  )}
                 </div>
               );
             }
@@ -112,6 +123,16 @@ class App extends Component {
                     transform: 'translate(-50%, -50%)'
                   }}
                 />
+                <h3
+                  style={{
+                    position: 'fixed',
+                    top: '75%',
+                    left: '50%',
+                    textAlign: 'center',
+                    transform: 'translate(-50%, -50%)'
+                  }}>
+                  Getting Current Location...
+                </h3>
               </div>
             );
           })()}
