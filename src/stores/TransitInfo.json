@@ -1,0 +1,183 @@
+{
+  "expo_line": {
+    "waterfront": {
+      "zone": 1
+    },
+    "granville": {
+      "zone": 1
+    },
+
+    "burrard": {
+      "zone": 1
+    },
+    "stadium_chinatown": {
+      "zone": 1
+    },
+    "main_street_science_world": {
+      "zone": 1
+    },
+    "commercial_broadway": {
+      "zone": 1
+    },
+    "nanaimo": {
+      "zone": 1
+    },
+    "29th_avenue": {
+      "zone": 1
+    },
+    "joyce_collingwood": {
+      "zone": 1
+    },
+    "patterson": {
+      "zone": 2
+    },
+    "metrotown": {
+      "zone": 2
+    },
+    "royale_oak": {
+      "zone": 2
+    },
+    "edmonds": {
+      "zone": 2
+    },
+    "22nd_street": {
+      "zone": 2
+    },
+    "new_westminster": {
+      "zone": 2
+    },
+    "columbia": {
+      "zone": 2
+    },
+    "sapperton": {
+      "zone": 2
+    },
+    "braid": {
+      "zone": 2
+    },
+    "lougheed_town_centre": {
+      "zone": 2
+    },
+    "production_way_university": {
+      "zone": 2
+    },
+    "scott_road": {
+      "zone": 3
+    },
+    "gateway": {
+      "zone": 3
+    },
+    "surrey_centre": {
+      "zone": 3
+    },
+    "king_george": {
+      "zone": 3
+    }
+  },
+  "millennium_line": {
+    "vcc_clark": {
+      "zone": 1
+    },
+    "commercial_broadway": {
+      "zone": 1
+    },
+    "renfrew": {
+      "zone": 1
+    },
+    "rupert": {
+      "zone": 1
+    },
+    "gilmore": {
+      "zone": 2
+    },
+    "brentwood_town_centre": {
+      "zone": 2
+    },
+    "holdom": {
+      "zone": 2
+    },
+    "sperling_burnaby_lake": {
+      "zone": 2
+    },
+    "lake_city_way": {
+      "zone": 2
+    },
+    "production_way_university": {
+      "zone": 2
+    },
+    "lougheed_town_centre": {
+      "zone": 2
+    },
+    "burquitlam": {
+      "zone": 3
+    },
+    "moody_centre": {
+      "zone": 3
+    },
+    "inlet_centre": {
+      "zone": 3
+    },
+    "coquitlam_central": {
+      "zone": 3
+    },
+    "lincoln": {
+      "zone": 3
+    },
+    "lafarge_lake_douglas": {
+      "zone": 3
+    }
+  },
+  "canada_line": {
+    "waterfront": {
+      "zone": 1
+    },
+    "vancouver_city_centre": {
+      "zone": 1
+    },
+    "yaletown_roundhouse": {
+      "zone": 1
+    },
+    "olympic_village": {
+      "zone": 1
+    },
+    "broadway_city_hall": {
+      "zone": 1
+    },
+    "king_edward": {
+      "zone": 1
+    },
+    "oakridge_41st_avenue": {
+      "zone": 1
+    },
+    "langara_49th_avenue": {
+      "zone": 1
+    },
+    "marine_drive": {
+      "zone": 1
+    },
+    "bridgeport": {
+      "zone": 2
+    },
+    "aberdeen": {
+      "zone": 2
+    },
+    "lansdowne": {
+      "zone": 2
+    },
+    "richmond_brighouse": {
+      "zone": 2
+    },
+    "templeton": {
+      "zone": 2,
+      "airport": true
+    },
+    "sea_island_centre": {
+      "zone": 2,
+      "airport": true
+    },
+    "yvr_airport": {
+      "zone": 2,
+      "airport": true
+    }
+  }
+}

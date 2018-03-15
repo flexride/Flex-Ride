@@ -12,6 +12,8 @@ import MapsPlace from 'material-ui/svg-icons/maps/place';
 import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
 import _ from 'lodash';
+import TransitStore from 'stores/TransitStore';
+import TransitInfo from 'stores/TransitInfo.json';
 
 import PopoverStep from './PopoverStep';
 
@@ -95,6 +97,25 @@ class Directions extends Component {
     const departureTime = moment().format('LT');
     const arrivalTime = moment().add(duration, 's').format('LT');
     const durationTime = moment.duration(duration, 'seconds').humanize();
+    const transits = steps.filter(step => {
+      return step.travel_mode === 'TRANSIT';
+    });
+    let transitPrice = 0;
+    if (transits.length > 0) {
+      const fare = transits.map(transit => {
+        const transitInfo = transit.transit;
+        const transitFare = TransitStore.getTransitPrice(transitInfo);
+        return transitFare;
+      });
+      const uniq = _.uniq(fare);
+      const final = _.difference(uniq, [2.2]);
+      if (final.length === 0) {
+        transitPrice = 2.2;
+      } else {
+        transitPrice = final[0];
+      }
+    }
+    console.log(transitPrice);
     return (
       <DirectionContainer className="Directions">
         <Paper style={styles.paperStyle}>
@@ -102,6 +123,8 @@ class Directions extends Component {
           <div>
             {durationTime}
           </div>
+          {transits.length > 0 &&
+            <div style={{ float: 'right' }}>{`price: $${transitPrice}`}</div>}
           <div>
             {`(${(distance / 1000).toFixed(2)} KM)`}
           </div>
@@ -139,7 +162,7 @@ class Directions extends Component {
                     disabled={mode === 'WALKING' ? true : false}
                     icon={this.getModeIcon(mode)}
                     label={`${humanizeMode} ${distance} (${duration})`}
-                    onClick={() => { }}
+                    onClick={() => {}}
                   />
                   {step.selected &&
                     DirectionsStore.showDetail &&
@@ -149,7 +172,7 @@ class Directions extends Component {
                       if (step.travel_mode === 'TRANSIT') {
                         transitInstruction = `${step.transit.departure_stop
                           .name} - ${step.transit.arrival_stop.name} (${step
-                            .transit.num_stops} stop(s))`;
+                          .transit.num_stops} stop(s))`;
                       }
                       const instruction = step.instructions.replace(
                         /<\/?[^>]+(>|$)/g,
