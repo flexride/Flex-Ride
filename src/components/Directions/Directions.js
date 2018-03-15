@@ -102,25 +102,8 @@ class Directions extends Component {
       return step.travel_mode === 'TRANSIT';
     });
     const transitInfo = transits[0].transit;
-    const train = {
-      expo_line: {
-        burrard_station: {
-          zone: 1
-        },
-        metrotown: {
-          zone: 2
-        },
-        granville_station: {
-          zone: 1
-        }
-      }
-    };
-    console.log(transitInfo.departure_stop.name);
-    const departure = _.snakeCase(transitInfo.departure_stop.name);
-    console.log('trasit info', transitInfo);
-    const line = _.snakeCase(transitInfo.line.short_name);
-    console.log(TransitInfo);
-    console.log(TransitInfo[line][departure]);
+    console.log('info: ', transitInfo);
+    console.log(TransitStore.getTransitPrice(transitInfo));
     return (
       <DirectionContainer className="Directions">
         <Paper style={styles.paperStyle}>
