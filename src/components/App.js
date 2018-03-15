@@ -16,7 +16,7 @@ import MapStore from '../stores/MapStore';
 import FlexMap from './Map/FlexMap';
 import Directions from './Directions/Directions';
 import SelectedStep from './Directions/SelectedStep';
-import ModoButton from './ModoButton';
+import ModoButton from './CarShare/ModoButton';
 import NotificationResource from '../resources/NotificationsResource';
 
 const muiTheme = getMuiTheme({
@@ -105,7 +105,7 @@ class App extends Component {
                       anchorEl={target}
                       style={{
                         padding: '10px 8px 8px 8px',
-                        overflow: 'visible'
+                        maxWidth: '250px'
                       }}
                       anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
                       targetOrigin={{ horizontal: 'left', vertical: 'top' }}

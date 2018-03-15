@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
-import IconButton from 'material-ui/IconButton';
-import ActionIcon from 'material-ui/svg-icons/action/info';
 import moment from 'moment';
 
 class ModoButton extends Component {
@@ -22,27 +20,23 @@ class ModoButton extends Component {
     return (
       <div>
         <div>
-          <b>Type: </b>
-          {selectedCar.category}
+          <b>Trip Type: </b>Round Trip
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <b>Car Info: </b>
+          <list>
+            <li>{selectedCar.category}</li>
+            <li>{`${selectedCar.make} ${selectedCar.model}`}</li>
+            <li>{selectedCar.seats} Seats</li>
+          </list>
         </div>
         <div>
-          <b>Car: </b>
-          {`${selectedCar.make} ${selectedCar.model}`}
-        </div>
-        <div>
-          <b>Seats: </b>
-          {selectedCar.seats}
-        </div>
-        <div>
-          <b>Cost Estimate:</b>
+          <b>Cost Estimate: </b>
           ${estimatedCost}
-          <IconButton
-            tooltip="Estimate based on one way trip duration, not including return trip."
-            touch={true}
-            tooltipPosition="top-right"
-            tooltipStyles={{ fontSize: '0.5em' }}>
-            <ActionIcon />
-          </IconButton>
+          <p style={{ fontSize: '0.65em', marginTop: '-2.5px' }}>
+            Estimate based on one way trip duration. Price is not including the
+            return trip or duration spent at destination.
+          </p>
         </div>
         <FlatButton
           label="Book With Modo"
