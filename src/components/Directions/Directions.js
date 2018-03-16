@@ -95,7 +95,9 @@ class Directions extends Component {
     const startAdd = leg.start_address;
     const destinationAdd = leg.end_address;
     const departureTime = moment().format('LT');
-    const arrivalTime = moment().add(duration, 's').format('LT');
+    const arrivalTime = moment()
+      .add(duration, 's')
+      .format('LT');
     const durationTime = moment.duration(duration, 'seconds').humanize();
     const transits = steps.filter(step => {
       return step.travel_mode === 'TRANSIT';
@@ -104,9 +106,15 @@ class Directions extends Component {
     if (transits.length > 0) {
       const fare = transits.map(transit => {
         const transitInfo = transit.transit;
+        if (transit.ignoreStation) {
+          return null;
+        }
         const transitFare = TransitStore.getTransitPrice(transitInfo);
         return transitFare;
       });
+      if (fare[0] === null) {
+        transitPrice = fare[0];
+      }
       const uniq = _.uniq(fare);
       const final = _.difference(uniq, [2.2]);
       if (final.length === 0) {
@@ -115,19 +123,16 @@ class Directions extends Component {
         transitPrice = final[0];
       }
     }
-    console.log(transitPrice);
     return (
       <DirectionContainer className="Directions">
         <Paper style={styles.paperStyle}>
           <div>{`${departureTime} - ${arrivalTime}`}</div>
-          <div>
-            {durationTime}
-          </div>
+          <div>{durationTime}</div>
           {transits.length > 0 &&
-            <div style={{ float: 'right' }}>{`price: $${transitPrice}`}</div>}
-          <div>
-            {`(${(distance / 1000).toFixed(2)} KM)`}
-          </div>
+            transitPrice !== null && (
+              <div style={{ float: 'right' }}>{`price: $${transitPrice}`}</div>
+            )}
+          <div>{`(${(distance / 1000).toFixed(2)} KM)`}</div>
           <TotalText>
             <ImageAdjust /> {startAdd}
           </TotalText>
@@ -150,7 +155,8 @@ class Directions extends Component {
                       });
                       this.props.selectStep(step);
                     }
-                  }}>
+                  }}
+                >
                   <RaisedButton
                     fullWidth
                     disabledBackgroundColor={
@@ -170,9 +176,11 @@ class Directions extends Component {
                     detailsSteps.map((step, j) => {
                       let transitInstruction;
                       if (step.travel_mode === 'TRANSIT') {
-                        transitInstruction = `${step.transit.departure_stop
-                          .name} - ${step.transit.arrival_stop.name} (${step
-                          .transit.num_stops} stop(s))`;
+                        transitInstruction = `${
+                          step.transit.departure_stop.name
+                        } - ${step.transit.arrival_stop.name} (${
+                          step.transit.num_stops
+                        } stop(s))`;
                       }
                       const instruction = step.instructions.replace(
                         /<\/?[^>]+(>|$)/g,
@@ -181,10 +189,9 @@ class Directions extends Component {
                       return (
                         <div key={`detail-step-${j}`}>
                           {instruction}
-                          {transitInstruction &&
-                            <div>
-                              {transitInstruction}
-                            </div>}
+                          {transitInstruction && (
+                            <div>{transitInstruction}</div>
+                          )}
                         </div>
                       );
                     })}
@@ -196,7 +203,8 @@ class Directions extends Component {
               anchorEl={this.state.anchorEl}
               anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
               targetOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-              onRequestClose={this.handleRequestClose}>
+              onRequestClose={this.handleRequestClose}
+            >
               <PopoverStep
                 step={steps.find(step => step.selected)}
                 selectNewMode={this.selectMode}
@@ -227,6 +235,8 @@ const TotalText = styled.div`
   over-flow: hidden;
 `;
 
-const DirectionContainer = styled.div`margin-top: 30px;`;
+const DirectionContainer = styled.div`
+  margin-top: 30px;
+`;
 
 export default Directions;

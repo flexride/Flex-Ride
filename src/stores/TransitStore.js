@@ -5,6 +5,7 @@ import TransitInfo from 'stores/TransitInfo.json';
 
 class TransitStore {
   getStationName(stationName) {
+    console.log(stationName);
     const underscore = _.snakeCase(stationName);
     const split = _.split(underscore, 'station');
     const station = _.snakeCase(split[0]);
@@ -15,8 +16,14 @@ class TransitStore {
     const regularPrice = 2.2;
     let addPrice = 0;
     const skytrain = ['expo_line', 'millennium_line', 'canada_line'];
-    const start = this.getStationName(transitInfo.departure_stop.name) || 1;
-    const end = this.getStationName(transitInfo.arrival_stop.name) || 1;
+    const defaultZone = {
+      zone: 1
+    };
+    console.log(transitInfo);
+    const start =
+      this.getStationName(transitInfo.departure_stop.name) || defaultZone;
+    const end =
+      this.getStationName(transitInfo.arrival_stop.name) || defaultZone;
     const line = this.getStationName(transitInfo.line.short_name);
     const currentTime = moment().format('HHmm');
     const isAfternoon = currentTime >= 1830;

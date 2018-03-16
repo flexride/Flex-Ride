@@ -63,7 +63,6 @@ class DirectionsStore {
         mode
       ).then(res => {
         secondHalf = res;
-        console.log('firstHalf Steps:', firstHalf.routes[0].legs[0].steps);
         this.replaceDirectionsFromPoint(
           this.selectedStep,
           firstHalf.routes[0].legs[0].steps,
@@ -107,6 +106,7 @@ class DirectionsStore {
         text: `${(distance / 1000).toFixed(2)} km`,
         value: distance
       },
+      ignoreStation: true,
       travel_mode: steps[0].travel_mode,
       instructions: `${humanizeMode} to ${routes.legs[0].end_address}`,
       lat_lngs: lat_lngs

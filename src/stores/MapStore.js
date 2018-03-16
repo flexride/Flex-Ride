@@ -35,7 +35,6 @@ class MapStore {
 
   getLocation = test => {
     if (navigator && navigator.geolocation) {
-      console.log('checking location');
       navigator.geolocation.getCurrentPosition(
         pos => {
           const { coords } = pos;
@@ -62,6 +61,7 @@ class MapStore {
   };
 
   onPlacesChanged = () => {
+    this.selectedPoint = null;
     const places = this.refs.searchBox.getPlaces();
     const bounds = new google.maps.LatLngBounds();
     if (places.length === 0) {
